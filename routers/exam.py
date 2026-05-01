@@ -1,455 +1,420 @@
-"""Exam engine router - handles exam sessions, questions, and scoring."""
+"""Exam engine router.
+
+Spec §5. The student lifecycle on exam day:
+
+  POST /exam/start               -> create or resume an ExamSession
+  GET  /exam/{session_id}        -> session state (status, time left, counts)
+  GET  /exam/{session_id}/questions  -> ordered questions, choices stripped
+  POST /exam/{session_id}/answer     -> save an answer (idempotent per question)
+  POST /exam/{session_id}/submit     -> finalize and grade
+
+Scoring (spec §1.4): each Question has `item_points`; each Choice has a
+`weight` of 1/choices_count when correct else 0. For 'pg' and 'tf' (single
+correct), score = item_points if the chosen choice is correct else 0. For
+'complex_mc' (multi-select), score = clamp(sum(selected weights), 0, 1) *
+item_points so partial-correct gets partial credit but extra wrong picks
+don't go negative.
+"""
+from __future__ import annotations
+
+import random
+from datetime import datetime, timedelta
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from typing import List, Optional
-from datetime import datetime, timedelta
-import jwt
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
-import sys
-sys.path.append('/workspace')
 from database import get_db
-from models import Student, Exam, Question, Choice as Answer, ExamSession, SessionViolation as Violation
-from routers.auth import decode_jwt
+from models import (
+    AnswerChoice, Choice, Exam, ExamResult, ExamSession,
+    Question, Student, StudentAnswer,
+)
+from routers.auth import get_current_student
 
-router = APIRouter(prefix="/api/exam", tags=["exam"])
-
-
-# --- Pydantic Schemas ---
-
-class ExamListItem(BaseModel):
-    id: int
-    title: str
-    subject: str
-    duration_minutes: int
-    total_questions: int
-    starts_at: datetime
-    ends_at: datetime
-    status: str  # upcoming, active, completed
-
-    class Config:
-        from_attributes = True
+router = APIRouter(prefix="/exam", tags=["exam"])
 
 
-class QuestionItem(BaseModel):
-    id: int
-    exam_question_id: int
-    question_number: int
-    text: str
-    question_type: str
-    options: Optional[List[str]] = None
-    image_url: Optional[str] = None
+# ---------------------------------------------------------------------------
+# Schemas
+# ---------------------------------------------------------------------------
 
-    class Config:
-        from_attributes = True
+class StartExamRequest(BaseModel):
+    exam_id: str
 
 
-class AnswerSubmit(BaseModel):
-    exam_question_id: int
-    answer_text: str
+class ChoiceOut(BaseModel):
+    id: str
+    body: str
 
 
-class AnswerSubmitResponse(BaseModel):
-    success: bool
-    message: str
+class QuestionOut(BaseModel):
+    id: str
+    question_type: str       # 'pg' | 'tf' | 'complex_mc'
+    body: str
+    image_url: Optional[str]
+    choices_count: int
+    choices: list[ChoiceOut]  # is_correct/weight intentionally omitted
 
 
-class ExamSessionStart(BaseModel):
-    exam_id: int
-
-
-class ExamSessionInfo(BaseModel):
-    session_id: int
-    exam_id: int
+class SessionState(BaseModel):
+    session_id: str
+    exam_id: str
     exam_title: str
-    time_remaining_seconds: int
-    questions_answered: int
-    total_questions: int
     status: str
+    time_remaining_seconds: int
+    questions_total: int
+    questions_answered: int
+    violation_count: int
+    locked_until: Optional[datetime]
 
-    class Config:
-        from_attributes = True
+
+class QuestionsResponse(BaseModel):
+    session_id: str
+    questions: list[QuestionOut]
 
 
-class ExamSubmissionResult(BaseModel):
-    success: bool
-    score: float
+class AnswerRequest(BaseModel):
+    question_id: str
+    choice_ids: list[str] = Field(default_factory=list)
+
+
+class AnswerResponse(BaseModel):
+    saved: bool
+    question_id: str
+    selected_count: int
+
+
+class SubmitResponse(BaseModel):
+    session_id: str
+    total_score: float
+    max_score: float
     percentage: float
-    correct_count: int
-    total_count: int
-    message: str
+    submitted_at: datetime
 
 
-# --- Helper Functions ---
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
-def get_current_student(db: Session = Depends(get_db), token: str = Depends(decode_jwt)) -> Student:
-    """Extract current student from JWT token."""
-    try:
-        # decode_jwt returns dict with 'sub' and 'role'
-        student_id = token.get("sub")
-        if student_id is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        
-        student = db.query(Student).filter(Student.id == student_id).first()
-        if not student:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
-        return student
-    except Exception:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+def _load_session(db: Session, session_id: str, student: Student) -> ExamSession:
+    s = db.query(ExamSession).filter_by(id=session_id).first()
+    if s is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="session not found")
+    if s.student_id != student.id:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="not your session")
+    return s
 
 
-# --- Routes ---
+def _exam_window_end(exam: Exam, started_at: datetime) -> datetime:
+    """A session ends at min(scheduled_at + duration, time_end-of-day)."""
+    duration_end = started_at + timedelta(minutes=exam.duration_minutes)
+    end_of_day = datetime.combine(exam.scheduled_at.date(), exam.time_end)
+    return min(duration_end, end_of_day)
 
-@router.get("/available", response_model=List[ExamListItem])
-def list_available_exams(
-    current_student: Student = Depends(get_current_student),
-    db: Session = Depends(get_db)
+
+def _time_remaining(s: ExamSession) -> int:
+    if s.status not in {"active", "pending"}:
+        return 0
+    if s.started_at is None:
+        return s.exam.duration_minutes * 60
+    deadline = _exam_window_end(s.exam, s.started_at)
+    remaining = (deadline - datetime.utcnow()).total_seconds()
+    return max(0, int(remaining))
+
+
+def _score_question(q: Question, selected_choice_ids: set[str]) -> float:
+    """Spec §1.4 scoring. Returns points earned for this question (0..item_points)."""
+    if not selected_choice_ids:
+        return 0.0
+    by_id = {c.id: c for c in q.choices}
+    if q.question_type in {"pg", "tf"}:
+        # Single-correct: any single matching pick earns full points; any
+        # wrong pick (or multi-pick on a single-correct question) earns 0.
+        if len(selected_choice_ids) != 1:
+            return 0.0
+        ch = by_id.get(next(iter(selected_choice_ids)))
+        return q.item_points if ch is not None and ch.is_correct else 0.0
+    # complex_mc: sum weights of selected choices, clamp to [0, 1].
+    total_weight = 0.0
+    for cid in selected_choice_ids:
+        ch = by_id.get(cid)
+        if ch is None:
+            continue
+        total_weight += ch.weight if ch.is_correct else -ch.weight
+    fraction = max(0.0, min(1.0, total_weight))
+    return q.item_points * fraction
+
+
+# ---------------------------------------------------------------------------
+# §5.1  POST /exam/start
+# ---------------------------------------------------------------------------
+
+@router.post("/start", response_model=SessionState)
+def start_exam(
+    body: StartExamRequest,
+    student: Student = Depends(get_current_student),
+    db: Session = Depends(get_db),
 ):
-    """
-    List all exams available to the current student.
-    Returns exams with status: upcoming, active, or completed.
-    """
-    now = datetime.utcnow()
-    
-    # Get all exams this student is enrolled in via their class level
-    exams = db.query(Exam).filter(
-        Exam.class_level == current_student.class_level,
-        Exam.subject == current_student.stream
-    ).order_by(Exam.starts_at).all()
-    
-    result = []
-    for exam in exams:
-        # Determine status
-        if now < exam.starts_at:
-            status_val = "upcoming"
-        elif now > exam.ends_at:
-            status_val = "completed"
-        else:
-            status_val = "active"
-        
-        # Count total questions
-        total_q = db.query(ExamQuestion).filter(ExamQuestion.exam_id == exam.id).count()
-        
-        result.append(ExamListItem(
-            id=exam.id,
-            title=exam.title,
-            subject=exam.subject,
-            duration_minutes=exam.duration_minutes,
-            total_questions=total_q,
-            starts_at=exam.starts_at,
-            ends_at=exam.ends_at,
-            status=status_val
-        ))
-    
-    return result
-
-
-@router.post("/session/start", response_model=ExamSessionInfo)
-def start_exam_session(
-    session_data: ExamSessionStart,
-    current_student: Student = Depends(get_current_student),
-    db: Session = Depends(get_db)
-):
-    """
-    Start a new exam session for the student.
-    Creates an ExamSession record and returns session info.
-    """
-    exam = db.query(Exam).filter(Exam.id == session_data.exam_id).first()
-    if not exam:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exam not found")
-    
-    now = datetime.utcnow()
-    
-    # Validate exam timing
-    if now < exam.starts_at:
+    exam = db.query(Exam).filter_by(id=body.exam_id).first()
+    if exam is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="exam not found")
+    if not exam.admin_confirmed:
+        # Spec §1.3: an exam must be admin-confirmed before students can start.
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Exam has not started yet. Starts at {exam.starts_at}"
+            status.HTTP_400_BAD_REQUEST,
+            detail="exam is not yet open (admin has not confirmed)",
         )
-    
-    if now > exam.ends_at:
+
+    now = datetime.utcnow()
+    if now < exam.scheduled_at:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Exam has already ended"
+            status.HTTP_400_BAD_REQUEST,
+            detail=f"exam starts at {exam.scheduled_at.isoformat()}",
         )
-    
-    # Check if student already has an active session for this exam
-    existing_session = db.query(ExamSession).filter(
-        ExamSession.student_id == current_student.id,
-        ExamSession.exam_id == exam.id,
-        ExamSession.status == "in_progress"
-    ).first()
-    
-    if existing_session:
-        # Return existing session
-        total_q = db.query(ExamQuestion).filter(ExamQuestion.exam_id == exam.id).count()
-        answered = db.query(Answer).filter(
-            Answer.session_id == existing_session.id
-        ).count()
-        
-        time_remaining = (exam.ends_at - now).total_seconds()
-        
-        return ExamSessionInfo(
-            session_id=existing_session.id,
+    end_of_day = datetime.combine(exam.scheduled_at.date(), exam.time_end)
+    if now > end_of_day:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, detail="exam window has closed",
+        )
+
+    # Resume an existing session if there is one (idempotent start).
+    s = (
+        db.query(ExamSession)
+        .filter_by(student_id=student.id, exam_id=exam.id)
+        .first()
+    )
+    if s is None:
+        question_ids = [q.id for q in exam.questions]
+        random.shuffle(question_ids)  # per-student randomized order
+        s = ExamSession(
+            student_id=student.id,
             exam_id=exam.id,
-            exam_title=exam.title,
-            time_remaining_seconds=int(time_remaining),
-            questions_answered=answered,
-            total_questions=total_q,
-            status=existing_session.status
+            status="active",
+            started_at=now,
+            question_order=question_ids,
         )
-    
-    # Create new session
-    new_session = ExamSession(
-        student_id=current_student.id,
-        exam_id=exam.id,
-        started_at=now,
-        status="in_progress"
-    )
-    db.add(new_session)
-    db.commit()
-    db.refresh(new_session)
-    
-    total_q = db.query(ExamQuestion).filter(ExamQuestion.exam_id == exam.id).count()
-    time_remaining = (exam.ends_at - now).total_seconds()
-    
-    return ExamSessionInfo(
-        session_id=new_session.id,
-        exam_id=exam.id,
-        exam_title=exam.title,
-        time_remaining_seconds=int(time_remaining),
-        questions_answered=0,
-        total_questions=total_q,
-        status="in_progress"
-    )
-
-
-@router.get("/session/{session_id}/question", response_model=QuestionItem)
-def get_question(
-    session_id: int,
-    exam_question_id: int,
-    current_student: Student = Depends(get_current_student),
-    db: Session = Depends(get_db)
-):
-    """
-    Get a specific question for an exam session.
-    Returns question WITHOUT the correct answer.
-    """
-    # Verify session belongs to student
-    session = db.query(ExamSession).filter(
-        ExamSession.id == session_id,
-        ExamSession.student_id == current_student.id
-    ).first()
-    
-    if not session:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
-    
-    if session.status != "in_progress":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Exam session is not active"
-        )
-    
-    # Get the exam question
-    exam_question = db.query(ExamQuestion).filter(
-        ExamQuestion.id == exam_question_id,
-        ExamQuestion.exam_id == session.exam_id
-    ).first()
-    
-    if not exam_question:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Question not found")
-    
-    question = exam_question.question
-    
-    # Build options list for multiple choice
-    options = None
-    if question.question_type == "multiple_choice":
-        options = [
-            question.option_a,
-            question.option_b,
-            question.option_c,
-            question.option_d
-        ]
-        # Filter out None values
-        options = [opt for opt in options if opt is not None]
-    
-    return QuestionItem(
-        id=question.id,
-        exam_question_id=exam_question.id,
-        question_number=exam_question.question_number,
-        text=question.text,
-        question_type=question.question_type,
-        options=options,
-        image_url=question.image_url
-    )
-
-
-@router.post("/session/{session_id}/answer", response_model=AnswerSubmitResponse)
-def submit_answer(
-    session_id: int,
-    answer_data: AnswerSubmit,
-    current_student: Student = Depends(get_current_student),
-    db: Session = Depends(get_db)
-):
-    """
-    Submit an answer for a question in the current exam session.
-    Students can re-submit answers before final exam submission.
-    """
-    # Verify session belongs to student
-    session = db.query(ExamSession).filter(
-        ExamSession.id == session_id,
-        ExamSession.student_id == current_student.id
-    ).first()
-    
-    if not session:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
-    
-    if session.status != "in_progress":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Exam session is not active"
-        )
-    
-    # Verify exam_question belongs to this exam
-    exam_question = db.query(ExamQuestion).filter(
-        ExamQuestion.id == answer_data.exam_question_id,
-        ExamQuestion.exam_id == session.exam_id
-    ).first()
-    
-    if not exam_question:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Question not found in this exam")
-    
-    # Check if answer already exists (allow update)
-    existing_answer = db.query(Answer).filter(
-        Answer.session_id == session_id,
-        Answer.exam_question_id == answer_data.exam_question_id
-    ).first()
-    
-    if existing_answer:
-        existing_answer.answer_text = answer_data.answer_text
-        existing_answer.updated_at = datetime.utcnow()
+        db.add(s)
+        db.commit()
+        db.refresh(s)
     else:
-        new_answer = Answer(
-            session_id=session_id,
-            exam_question_id=answer_data.exam_question_id,
-            answer_text=answer_data.answer_text
-        )
-        db.add(new_answer)
-    
-    db.commit()
-    
-    return AnswerSubmitResponse(
-        success=True,
-        message="Answer saved successfully"
-    )
+        if s.status == "submitted":
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST, detail="exam already submitted",
+            )
+        if s.status == "expelled":
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN, detail="expelled from this exam",
+            )
+        if s.status == "pending":
+            s.status = "active"
+            s.started_at = s.started_at or now
+            db.commit()
+            db.refresh(s)
+
+    return _state_for(s, db)
 
 
-@router.post("/session/{session_id}/submit", response_model=ExamSubmissionResult)
-def submit_exam(
-    session_id: int,
-    current_student: Student = Depends(get_current_student),
-    db: Session = Depends(get_db)
+# ---------------------------------------------------------------------------
+# §5.2  GET /exam/{session_id}  (state)
+# ---------------------------------------------------------------------------
+
+@router.get("/{session_id}", response_model=SessionState)
+def session_state(
+    session_id: str,
+    student: Student = Depends(get_current_student),
+    db: Session = Depends(get_db),
 ):
-    """
-    Submit the exam for grading.
-    Calculates score immediately and updates session status.
-    """
-    # Verify session belongs to student
-    session = db.query(ExamSession).filter(
-        ExamSession.id == session_id,
-        ExamSession.student_id == current_student.id
-    ).first()
-    
-    if not session:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
-    
-    if session.status == "submitted":
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Exam has already been submitted"
-        )
-    
-    # Get all exam questions
-    exam_questions = db.query(ExamQuestion).filter(
-        ExamQuestion.exam_id == session.exam_id
-    ).all()
-    
-    total_count = len(exam_questions)
-    correct_count = 0
-    
-    # Grade each question
-    for eq in exam_questions:
-        # Find student's answer
-        answer = db.query(Answer).filter(
-            Answer.session_id == session_id,
-            Answer.exam_question_id == eq.id
-        ).first()
-        
-        student_answer = answer.answer_text.strip().lower() if answer and answer.answer_text else ""
-        correct_answer = eq.question.correct_answer.strip().lower() if eq.question.correct_answer else ""
-        
-        # Simple string comparison for grading
-        if student_answer == correct_answer:
-            correct_count += 1
-        
-        # Store the correct answer in the Answer record for review
-        if answer:
-            answer.is_correct = (student_answer == correct_answer)
-            answer.points_earned = eq.points if answer.is_correct else 0
-    
-    # Calculate score
-    score = correct_count / total_count if total_count > 0 else 0
-    percentage = score * 100
-    
-    # Update session
-    session.status = "submitted"
-    session.submitted_at = datetime.utcnow()
-    session.score = score
-    
-    db.commit()
-    
-    return ExamSubmissionResult(
-        success=True,
-        score=score,
-        percentage=percentage,
-        correct_count=correct_count,
-        total_count=total_count,
-        message=f"Exam submitted! Score: {correct_count}/{total_count} ({percentage:.1f}%)"
+    s = _load_session(db, session_id, student)
+    return _state_for(s, db)
+
+
+def _state_for(s: ExamSession, db: Session) -> SessionState:
+    answered = (
+        db.query(StudentAnswer).filter_by(session_id=s.id).count()
     )
-
-
-@router.get("/session/{session_id}/status", response_model=ExamSessionInfo)
-def get_session_status(
-    session_id: int,
-    current_student: Student = Depends(get_current_student),
-    db: Session = Depends(get_db)
-):
-    """Get current status of an exam session."""
-    session = db.query(ExamSession).filter(
-        ExamSession.id == session_id,
-        ExamSession.student_id == current_student.id
-    ).first()
-    
-    if not session:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
-    
-    exam = db.query(Exam).filter(Exam.id == session.exam_id).first()
-    total_q = db.query(ExamQuestion).filter(ExamQuestion.exam_id == exam.id).count()
-    answered = db.query(Answer).filter(Answer.session_id == session_id).count()
-    
-    now = datetime.utcnow()
-    if session.status == "in_progress":
-        time_remaining = max(0, (exam.ends_at - now).total_seconds())
-    else:
-        time_remaining = 0
-    
-    return ExamSessionInfo(
-        session_id=session.id,
-        exam_id=exam.id,
-        exam_title=exam.title,
-        time_remaining_seconds=int(time_remaining),
+    total = len(s.question_order or []) or len(s.exam.questions)
+    return SessionState(
+        session_id=s.id,
+        exam_id=s.exam_id,
+        exam_title=s.exam.title,
+        status=s.status,
+        time_remaining_seconds=_time_remaining(s),
+        questions_total=total,
         questions_answered=answered,
-        total_questions=total_q,
-        status=session.status
+        violation_count=s.violation_count,
+        locked_until=s.locked_until,
+    )
+
+
+# ---------------------------------------------------------------------------
+# §5.3  GET /exam/{session_id}/questions
+# ---------------------------------------------------------------------------
+
+@router.get("/{session_id}/questions", response_model=QuestionsResponse)
+def list_questions(
+    session_id: str,
+    student: Student = Depends(get_current_student),
+    db: Session = Depends(get_db),
+):
+    s = _load_session(db, session_id, student)
+    if s.status not in {"active", "pending"}:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail=f"session is {s.status}, cannot fetch questions",
+        )
+    if s.locked_until and s.locked_until > datetime.utcnow():
+        raise HTTPException(
+            status.HTTP_423_LOCKED,
+            detail=f"session locked until {s.locked_until.isoformat()}",
+        )
+
+    order = s.question_order or [q.id for q in s.exam.questions]
+    q_by_id = {q.id: q for q in s.exam.questions}
+
+    out: list[QuestionOut] = []
+    for qid in order:
+        q = q_by_id.get(qid)
+        if q is None:
+            # Question was deleted after the session started; skip it.
+            continue
+        out.append(QuestionOut(
+            id=q.id,
+            question_type=q.question_type,
+            body=q.body,
+            image_url=q.image_url,
+            choices_count=q.choices_count,
+            # Strip is_correct/weight before sending to the student.
+            choices=[ChoiceOut(id=c.id, body=c.body) for c in q.choices],
+        ))
+
+    return QuestionsResponse(session_id=s.id, questions=out)
+
+
+# ---------------------------------------------------------------------------
+# §5.4  POST /exam/{session_id}/answer
+# ---------------------------------------------------------------------------
+
+@router.post("/{session_id}/answer", response_model=AnswerResponse)
+def save_answer(
+    session_id: str,
+    body: AnswerRequest,
+    student: Student = Depends(get_current_student),
+    db: Session = Depends(get_db),
+):
+    s = _load_session(db, session_id, student)
+    if s.status not in {"active", "pending"}:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail=f"session is {s.status}, cannot save answers",
+        )
+    if s.locked_until and s.locked_until > datetime.utcnow():
+        raise HTTPException(
+            status.HTTP_423_LOCKED,
+            detail=f"session locked until {s.locked_until.isoformat()}",
+        )
+
+    q = db.query(Question).filter_by(id=body.question_id).first()
+    if q is None or q.exam_id != s.exam_id:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, detail="question not in this exam",
+        )
+
+    valid_choice_ids = {c.id for c in q.choices}
+    requested = set(body.choice_ids)
+    if not requested.issubset(valid_choice_ids):
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="one or more choice_ids do not belong to this question",
+        )
+    if q.question_type in {"pg", "tf"} and len(requested) > 1:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail=f"{q.question_type} question accepts at most one choice",
+        )
+
+    # Upsert StudentAnswer — UNIQUE(session_id, question_id) guarantees one row.
+    sa = (
+        db.query(StudentAnswer)
+        .filter_by(session_id=s.id, question_id=q.id)
+        .first()
+    )
+    if sa is None:
+        sa = StudentAnswer(session_id=s.id, question_id=q.id)
+        db.add(sa)
+        db.flush()
+    else:
+        # Replace prior selections.
+        db.query(AnswerChoice).filter_by(student_answer_id=sa.id).delete()
+
+    for cid in requested:
+        db.add(AnswerChoice(student_answer_id=sa.id, choice_id=cid))
+
+    db.commit()
+    return AnswerResponse(
+        saved=True, question_id=q.id, selected_count=len(requested),
+    )
+
+
+# ---------------------------------------------------------------------------
+# §5.5  POST /exam/{session_id}/submit
+# ---------------------------------------------------------------------------
+
+@router.post("/{session_id}/submit", response_model=SubmitResponse)
+def submit_exam(
+    session_id: str,
+    student: Student = Depends(get_current_student),
+    db: Session = Depends(get_db),
+):
+    s = _load_session(db, session_id, student)
+    if s.status == "submitted":
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, detail="already submitted",
+        )
+    if s.status == "expelled":
+        # Expelled sessions are auto-finalized by the violation handler,
+        # not by the student. They should never reach this endpoint.
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, detail="session was expelled",
+        )
+
+    questions = list(s.exam.questions)
+    answers_by_qid = {a.question_id: a for a in s.answers}
+
+    total_score = 0.0
+    max_score = 0.0
+    for q in questions:
+        max_score += q.item_points
+        sa = answers_by_qid.get(q.id)
+        selected = (
+            {ac.choice_id for ac in sa.answer_choices} if sa is not None else set()
+        )
+        earned = _score_question(q, selected)
+        if sa is not None:
+            sa.score_earned = earned
+        total_score += earned
+
+    s.status = "submitted"
+    s.submitted_at = datetime.utcnow()
+
+    # Replace any prior ExamResult (defensive — shouldn't exist since we
+    # block re-submit above).
+    if s.result is not None:
+        db.delete(s.result)
+        db.flush()
+    db.add(ExamResult(
+        session_id=s.id,
+        total_score=total_score,
+        max_score=max_score,
+    ))
+
+    db.commit()
+
+    pct = (total_score / max_score * 100.0) if max_score > 0 else 0.0
+    return SubmitResponse(
+        session_id=s.id,
+        total_score=total_score,
+        max_score=max_score,
+        percentage=round(pct, 2),
+        submitted_at=s.submitted_at,
     )
