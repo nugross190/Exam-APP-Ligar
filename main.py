@@ -10,7 +10,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import auth, confirm
+from routers import auth, confirm, exam, violation
 
 app = FastAPI(
     title="HADIR Exam App",
@@ -34,9 +34,11 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(confirm.router)
 
+# Week 2 - Core Exam Engine
+app.include_router(exam.router)
+app.include_router(violation.router)
+
 # As you build more, uncomment as you go:
-# app.include_router(exam.router)
-# app.include_router(violation.router)
 # app.include_router(teacher.router)
 # app.include_router(admin.router)
 
