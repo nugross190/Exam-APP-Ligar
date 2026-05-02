@@ -45,16 +45,21 @@ app.include_router(admin.router)
 # Static mount for question images uploaded via /teacher/question/{id}/image.
 # In production this should point at a Railway volume or be replaced by an
 # R2/S3 redirect; the URL prefix is matched in routers/teacher.py.
+# Mount /uploads BEFORE the catch-all /static mount below so it wins.
 _upload_dir = Path(os.environ.get("UPLOAD_DIR", "uploads")).resolve()
 _upload_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(_upload_dir)), name="uploads")
 
 
-@app.get("/")
-def root():
-    return {"app": "hadir-exam", "version": "0.1.0"}
-
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+# Student client (spec §6.1 exam-client.html). Served at root with
+# html=True so '/' returns static/index.html and SPA-style deep links
+# fall back to the same page. Explicit FastAPI routes (auth, confirm,
+# exam, etc.) are registered before this mount and so take precedence.
+_static_dir = Path(__file__).parent / "static"
+if _static_dir.is_dir():
+    app.mount("/", StaticFiles(directory=str(_static_dir), html=True), name="client")

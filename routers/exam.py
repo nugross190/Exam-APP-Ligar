@@ -27,8 +27,8 @@ from sqlalchemy.orm import Session
 
 from database import get_db, utcnow
 from models import (
-    AnswerChoice, Choice, Exam, ExamResult, ExamSession,
-    Question, Student, StudentAnswer,
+    AnswerChoice, Choice, ClassSubject, Exam, ExamResult, ExamSession,
+    Question, Student, StudentAnswer, Subject,
 )
 from routers.auth import get_current_student
 
@@ -144,6 +144,76 @@ def _score_question(q: Question, selected_choice_ids: set[str]) -> float:
         total_weight += ch.weight if ch.is_correct else -ch.weight
     fraction = max(0.0, min(1.0, total_weight))
     return q.item_points * fraction
+
+
+class AvailableExam(BaseModel):
+    exam_id: str
+    title: str
+    subject_name: str
+    scheduled_at: datetime
+    time_end: str            # 'HH:MM'
+    duration_minutes: int
+    status: str              # 'open' | 'scheduled' | 'closed'
+    session_status: Optional[str]  # 'pending'|'active'|'submitted'|'expelled'|'panic'
+
+
+# ---------------------------------------------------------------------------
+# GET /exam/available  — discovery endpoint for the student client
+# ---------------------------------------------------------------------------
+
+@router.get("/available", response_model=list[AvailableExam])
+def list_available(
+    student: Student = Depends(get_current_student),
+    db: Session = Depends(get_db),
+):
+    """Return the exams this student can see today.
+
+    Filters: admin_confirmed=True (otherwise the student doesn't even
+    know it exists) AND the exam is mapped to the student's class via
+    ClassSubject. The 'status' field tells the client whether the
+    student can start right now ('open'), is too early ('scheduled'),
+    or too late ('closed').
+    """
+    rows = (
+        db.query(Exam, Subject)
+        .join(Subject, Exam.subject_id == Subject.id)
+        .join(ClassSubject, ClassSubject.subject_id == Subject.id)
+        .filter(
+            ClassSubject.class_id == student.class_id,
+            Exam.admin_confirmed == True,  # noqa: E712 — SQLAlchemy
+        )
+        .order_by(Exam.scheduled_at)
+        .all()
+    )
+
+    # Pre-load this student's existing sessions so the client can
+    # decide whether to "Start" or "Resume" or hide the button.
+    sessions = {
+        s.exam_id: s.status
+        for s in db.query(ExamSession).filter_by(student_id=student.id).all()
+    }
+
+    now = utcnow()
+    out: list[AvailableExam] = []
+    for exam, subj in rows:
+        end_of_day = datetime.combine(exam.scheduled_at.date(), exam.time_end)
+        if now < exam.scheduled_at:
+            disp = "scheduled"
+        elif now > end_of_day:
+            disp = "closed"
+        else:
+            disp = "open"
+        out.append(AvailableExam(
+            exam_id=exam.id,
+            title=exam.title,
+            subject_name=subj.name,
+            scheduled_at=exam.scheduled_at,
+            time_end=exam.time_end.strftime("%H:%M"),
+            duration_minutes=exam.duration_minutes,
+            status=disp,
+            session_status=sessions.get(exam.id),
+        ))
+    return out
 
 
 # ---------------------------------------------------------------------------

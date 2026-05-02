@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d6efd">
+<title>HADIR — Ujian SMAN 5 Garut</title>
+<style>
+:root {
+  --bg: #f4f5f7;
+  --panel: #fff;
+  --ink: #1f2328;
+  --muted: #57606a;
+  --border: #d0d7de;
+  --accent: #0d6efd;
+  --accent-ink: #fff;
+  --warn: #b54708;
+  --warn-bg: #fef3c7;
+  --danger: #b42318;
+  --danger-bg: #fee4e2;
+  --ok: #067647;
+  --ok-bg: #dcfae6;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+.app { max-width: 720px; margin: 0 auto; padding: 16px; }
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; margin: -16px -16px 16px;
+  background: var(--accent); color: var(--accent-ink);
+}
+header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+header .who { font-size: 14px; opacity: .9; }
+.panel {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 20px; margin-bottom: 16px;
+}
+h2 { margin: 0 0 12px; font-size: 18px; }
+p.muted { color: var(--muted); margin: 0 0 16px; font-size: 14px; }
+label { display: block; font-size: 14px; margin: 12px 0 4px; color: var(--muted); }
+input[type=text], input[type=password] {
+  width: 100%; padding: 12px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 16px; font-family: inherit;
+}
+input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+button {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 18px; border: 0; border-radius: 8px;
+  font-size: 16px; font-weight: 500; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink);
+  font-family: inherit;
+}
+button:active { transform: translateY(1px); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--border); }
+button.danger { background: var(--danger); }
+button.full { width: 100%; }
+.error {
+  color: var(--danger); background: var(--danger-bg);
+  padding: 10px 12px; border-radius: 8px; font-size: 14px;
+  margin: 12px 0;
+}
+.status-pill {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 500;
+}
+.pill-open    { color: var(--ok);     background: var(--ok-bg); }
+.pill-scheduled { color: var(--accent);  background: #dbeafe; }
+.pill-closed  { color: var(--muted);  background: #eef0f2; }
+.pill-submitted { color: var(--ok); background: var(--ok-bg); }
+.pill-expelled  { color: var(--danger); background: var(--danger-bg); }
+.exam-list { list-style: none; padding: 0; margin: 0; }
+.exam-list li {
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.exam-list li:last-child { border-bottom: 0; }
+.exam-list .meta { flex: 1; min-width: 0; }
+.exam-list .title { font-weight: 500; }
+.exam-list .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* Exam taking */
+.timer {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--panel); border-bottom: 1px solid var(--border);
+  margin: -20px -20px 20px; padding: 12px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.timer .left { font-weight: 600; font-size: 18px; }
+.timer .left.warn { color: var(--warn); }
+.timer .left.crit { color: var(--danger); }
+.qcard {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 12px; background: var(--panel);
+}
+.qcard .qno {
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.qcard .qbody {
+  font-size: 16px; margin: 6px 0 12px; white-space: pre-wrap;
+}
+.qcard img { max-width: 100%; border-radius: 6px; margin: 6px 0 12px; }
+.choice {
+  display: flex; gap: 10px; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 8px;
+  margin-bottom: 8px; cursor: pointer; user-select: none;
+}
+.choice:hover { background: #f6f8fa; }
+.choice input { margin-top: 3px; }
+.choice.selected { background: #dbeafe; border-color: var(--accent); }
+.toolbar {
+  position: sticky; bottom: 0; background: var(--panel);
+  margin: 16px -20px -20px; padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px; justify-content: space-between;
+}
+.banner-warn {
+  background: var(--warn-bg); color: var(--warn);
+  border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px;
+  font-size: 14px;
+}
+.banner-danger {
+  background: var(--danger-bg); color: var(--danger);
+  border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px;
+}
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; padding: 16px;
+}
+.modal {
+  background: var(--panel); border-radius: var(--radius);
+  padding: 24px; max-width: 420px; width: 100%;
+}
+.hidden { display: none !important; }
+.row { display: flex; gap: 8px; }
+.row > * { flex: 1; }
+.score {
+  text-align: center; padding: 24px 0;
+}
+.score .big { font-size: 56px; font-weight: 700; color: var(--accent); }
+.score .small { color: var(--muted); margin-top: 4px; }
+@media (max-width: 480px) {
+  body { font-size: 15px; }
+  .panel { padding: 16px; }
+  header h1 { font-size: 16px; }
+  .qcard .qbody { font-size: 15px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>HADIR — Ujian Online</h1>
+    <span class="who" id="whoami"></span>
+  </header>
+
+  <!-- ======= Screen: Login ======= -->
+  <section class="panel" id="screen-login">
+    <h2>Masuk Sebagai Siswa</h2>
+    <p class="muted">Gunakan NIS dan 6 digit terakhir NISN Anda.</p>
+    <form id="login-form">
+      <label for="username">NIS</label>
+      <input id="username" name="username" type="text" autocomplete="username" required>
+      <label for="password">6 digit terakhir NISN</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <div class="error hidden" id="login-error"></div>
+      <button type="submit" class="full" id="login-btn" style="margin-top:16px">Masuk</button>
+    </form>
+  </section>
+
+  <!-- ======= Screen: Picker ======= -->
+  <section class="panel hidden" id="screen-picker">
+    <h2>Daftar Ujian</h2>
+    <p class="muted" id="picker-empty">Memuat…</p>
+    <ul class="exam-list" id="exam-list"></ul>
+    <div style="margin-top:16px">
+      <button class="ghost full" id="logout-btn">Keluar</button>
+    </div>
+  </section>
+
+  <!-- ======= Screen: Exam ======= -->
+  <section class="panel hidden" id="screen-exam">
+    <div class="timer">
+      <span class="left" id="time-left">--:--</span>
+      <span id="answered-count">0 / 0 dijawab</span>
+    </div>
+    <div id="violation-banner" class="hidden"></div>
+    <div id="lock-banner" class="hidden"></div>
+    <div id="questions"></div>
+    <div class="toolbar">
+      <button class="ghost" id="panic-btn">Tombol Darurat</button>
+      <button id="submit-btn">Selesai &amp; Kumpulkan</button>
+    </div>
+  </section>
+
+  <!-- ======= Screen: Result ======= -->
+  <section class="panel hidden" id="screen-result">
+    <h2>Ujian Selesai</h2>
+    <div class="score">
+      <div class="big" id="result-pct">--%</div>
+      <div class="small" id="result-detail"></div>
+    </div>
+    <button class="full" id="result-back">Kembali ke Daftar Ujian</button>
+  </section>
+
+  <!-- Confirm-submit modal -->
+  <div class="modal-bg hidden" id="confirm-modal">
+    <div class="modal">
+      <h2>Yakin mau dikumpulkan?</h2>
+      <p class="muted">Setelah dikumpulkan, jawaban tidak bisa diubah.</p>
+      <div class="row" style="margin-top:16px">
+        <button class="ghost" id="confirm-cancel">Batal</button>
+        <button id="confirm-ok">Ya, Kumpulkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panic confirm modal -->
+  <div class="modal-bg hidden" id="panic-modal">
+    <div class="modal">
+      <h2>Tombol Darurat</h2>
+      <p class="muted">
+        Hanya gunakan jika terjadi keadaan darurat (lampu padam, sakit, dll).
+        Jawaban yang sudah Anda simpan akan tetap tersimpan, tetapi sesi
+        ujian akan ditutup. Tunjukkan layar ini ke pengawas.
+      </p>
+      <div class="row" style="margin-top:16px">
+        <button class="ghost" id="panic-cancel">Batal</button>
+        <button class="danger" id="panic-ok">Lanjut</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+// ---------------------------------------------------------------------------
+// API client
+// ---------------------------------------------------------------------------
+const API = {
+  base: "",
+  token: () => localStorage.getItem("hadir_jwt"),
+  setToken: t => localStorage.setItem("hadir_jwt", t),
+  clearToken: () => localStorage.removeItem("hadir_jwt"),
+
+  async req(method, path, body, opts) {
+    const headers = { "Accept": "application/json" };
+    const t = API.token();
+    if (t) headers["Authorization"] = "Bearer " + t;
+    const init = { method, headers };
+    if (body !== undefined) {
+      headers["Content-Type"] = "application/json";
+      init.body = JSON.stringify(body);
+    }
+    const res = await fetch(API.base + path, init);
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch { data = { detail: text }; }
+    if (!res.ok) {
+      const err = new Error((data && data.detail) || res.statusText);
+      err.status = res.status;
+      err.data = data;
+      throw err;
+    }
+    return data;
+  },
+
+  login: (username, password) =>
+    API.req("POST", "/auth/student/login", { username, password }),
+  available: () => API.req("GET", "/exam/available"),
+  start:    (exam_id) => API.req("POST", "/exam/start", { exam_id }),
+  state:    (sid) => API.req("GET", `/exam/${sid}`),
+  questions:(sid) => API.req("GET", `/exam/${sid}/questions`),
+  answer:   (sid, qid, choice_ids) =>
+    API.req("POST", `/exam/${sid}/answer`, { question_id: qid, choice_ids }),
+  submit:   (sid) => API.req("POST", `/exam/${sid}/submit`),
+  violation:(sid, event_type) =>
+    API.req("POST", `/violation/${sid}`, { event_type }),
+  panic:    (sid) => API.req("POST", `/violation/${sid}/panic`),
+};
+
+// ---------------------------------------------------------------------------
+// View helpers
+// ---------------------------------------------------------------------------
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+function show(id) {
+  $$(".panel").forEach(p => p.classList.add("hidden"));
+  $(id).classList.remove("hidden");
+}
+function setError(id, msg) {
+  const el = $(id);
+  if (!msg) { el.classList.add("hidden"); el.textContent = ""; return; }
+  el.classList.remove("hidden");
+  el.textContent = msg;
+}
+function fmtTime(sec) {
+  if (sec <= 0) return "00:00";
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+}
+function pillClass(s) {
+  return "status-pill pill-" + (s || "scheduled");
+}
+
+// ---------------------------------------------------------------------------
+// Login
+// ---------------------------------------------------------------------------
+$("#login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  setError("#login-error", "");
+  $("#login-btn").disabled = true;
+  try {
+    const data = await API.login(
+      $("#username").value.trim(),
+      $("#password").value,
+    );
+    API.setToken(data.access_token);
+    sessionStorage.setItem("hadir_name", data.name);
+    sessionStorage.setItem("hadir_class", data.class_name);
+    await goPicker();
+  } catch (err) {
+    setError("#login-error", err.message || "Gagal masuk.");
+  } finally {
+    $("#login-btn").disabled = false;
+  }
+});
+
+$("#logout-btn").addEventListener("click", () => {
+  API.clearToken();
+  sessionStorage.clear();
+  $("#whoami").textContent = "";
+  show("#screen-login");
+});
+
+// ---------------------------------------------------------------------------
+// Picker
+// ---------------------------------------------------------------------------
+async function goPicker() {
+  show("#screen-picker");
+  const name = sessionStorage.getItem("hadir_name") || "";
+  const klass = sessionStorage.getItem("hadir_class") || "";
+  $("#whoami").textContent = name + (klass ? " · " + klass : "");
+
+  const ul = $("#exam-list");
+  ul.innerHTML = "";
+  $("#picker-empty").textContent = "Memuat…";
+
+  let exams;
+  try {
+    exams = await API.available();
+  } catch (err) {
+    if (err.status === 401) { API.clearToken(); show("#screen-login"); return; }
+    $("#picker-empty").textContent = "Gagal memuat: " + err.message;
+    return;
+  }
+
+  if (!exams.length) {
+    $("#picker-empty").textContent =
+      "Belum ada ujian yang dibuka oleh admin. Coba lagi nanti.";
+    return;
+  }
+  $("#picker-empty").textContent = "";
+
+  for (const e of exams) {
+    const li = document.createElement("li");
+    const meta = document.createElement("div"); meta.className = "meta";
+    const title = document.createElement("div"); title.className = "title";
+    title.textContent = e.subject_name;
+    const sub = document.createElement("div"); sub.className = "sub";
+    const dt = new Date(e.scheduled_at);
+    const localTime = dt.toLocaleString("id-ID",
+      { dateStyle: "medium", timeStyle: "short" });
+    sub.textContent = localTime + " · " + e.duration_minutes + " menit";
+    meta.appendChild(title);
+    meta.appendChild(sub);
+
+    const right = document.createElement("div");
+    if (e.session_status === "submitted") {
+      const p = document.createElement("span");
+      p.className = pillClass("submitted");
+      p.textContent = "Selesai";
+      right.appendChild(p);
+    } else if (e.session_status === "expelled" || e.session_status === "panic") {
+      const p = document.createElement("span");
+      p.className = pillClass("expelled");
+      p.textContent = e.session_status === "panic" ? "Darurat" : "Diskualifikasi";
+      right.appendChild(p);
+    } else if (e.status === "open") {
+      const btn = document.createElement("button");
+      btn.textContent = e.session_status === "active" ? "Lanjutkan" : "Mulai";
+      btn.addEventListener("click", () => startExam(e.exam_id));
+      right.appendChild(btn);
+    } else {
+      const p = document.createElement("span");
+      p.className = pillClass(e.status);
+      p.textContent = e.status === "scheduled" ? "Belum Mulai" : "Sudah Tutup";
+      right.appendChild(p);
+    }
+
+    li.appendChild(meta);
+    li.appendChild(right);
+    ul.appendChild(li);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Exam state (lives only while screen-exam is visible)
+// ---------------------------------------------------------------------------
+const Exam = {
+  sessionId: null,
+  questions: [],
+  answers: {},          // { qid: [choice_id, ...] }
+  saveTimers: {},
+  timerHandle: null,
+  pollHandle: null,
+  endsAt: null,         // unix ms
+  lockUntil: null,      // unix ms or null
+  ended: false,         // prevents double-submit / extra POSTs
+};
+
+async function startExam(examId) {
+  setError("#login-error", "");
+  let sess;
+  try {
+    sess = await API.start(examId);
+  } catch (err) {
+    alert("Gagal memulai ujian: " + err.message);
+    return;
+  }
+  Exam.sessionId = sess.session_id;
+  Exam.endsAt = Date.now() + sess.time_remaining_seconds * 1000;
+  Exam.lockUntil = sess.locked_until ? Date.parse(sess.locked_until + "Z") : null;
+  Exam.ended = false;
+  Exam.answers = {};
+
+  let qs;
+  try {
+    qs = await API.questions(sess.session_id);
+  } catch (err) {
+    if (err.status === 423) {
+      // Locked from earlier violation. Show a friendlier message.
+      const m = err.data && err.data.detail || "";
+      alert("Sesi sedang dikunci sementara. " + m);
+      return;
+    }
+    alert("Gagal memuat soal: " + err.message);
+    return;
+  }
+  Exam.questions = qs.questions;
+  show("#screen-exam");
+  renderQuestions();
+  startExamTimers();
+  attachAntiCheat();
+}
+
+function renderQuestions() {
+  const root = $("#questions");
+  root.innerHTML = "";
+  Exam.questions.forEach((q, idx) => {
+    const card = document.createElement("div"); card.className = "qcard";
+    const no = document.createElement("div"); no.className = "qno";
+    no.textContent = "Soal " + (idx + 1) + " / " + Exam.questions.length
+                   + " · " + q.question_type.toUpperCase();
+    const body = document.createElement("div"); body.className = "qbody";
+    body.textContent = q.body;
+    card.appendChild(no); card.appendChild(body);
+
+    if (q.image_url) {
+      const img = document.createElement("img");
+      img.src = q.image_url; img.alt = "Gambar soal";
+      card.appendChild(img);
+    }
+
+    const multi = q.question_type === "complex_mc";
+    q.choices.forEach((c) => {
+      const lab = document.createElement("label"); lab.className = "choice";
+      const inp = document.createElement("input");
+      inp.type = multi ? "checkbox" : "radio";
+      inp.name = "q-" + q.id;
+      inp.value = c.id;
+      inp.addEventListener("change", () => onChoiceChange(q, lab));
+      const span = document.createElement("span");
+      span.textContent = c.body;
+      lab.appendChild(inp); lab.appendChild(span);
+      card.appendChild(lab);
+    });
+    root.appendChild(card);
+  });
+  updateAnsweredCount();
+}
+
+function onChoiceChange(q, _changedLabel) {
+  // Recompute selection for this question, reflect "selected" CSS,
+  // and queue a debounced save.
+  const inputs = $$('input[name="q-' + q.id + '"]');
+  const selected = [];
+  inputs.forEach(inp => {
+    inp.parentElement.classList.toggle("selected", inp.checked);
+    if (inp.checked) selected.push(inp.value);
+  });
+  Exam.answers[q.id] = selected;
+  updateAnsweredCount();
+
+  // Debounce: save 400ms after the last click. Avoids hammering the
+  // API when the student is rapidly toggling on a complex_mc question.
+  if (Exam.saveTimers[q.id]) clearTimeout(Exam.saveTimers[q.id]);
+  Exam.saveTimers[q.id] = setTimeout(() => saveAnswer(q.id), 400);
+}
+
+async function saveAnswer(qid) {
+  if (Exam.ended) return;
+  try {
+    await API.answer(Exam.sessionId, qid, Exam.answers[qid] || []);
+  } catch (err) {
+    if (err.status === 423) {
+      // Locked — we'll re-flush on unlock via the state poll.
+      return;
+    }
+    if (err.status === 400 || err.status === 403) {
+      // Likely session ended (submitted/expelled/panic). Stop trying.
+      Exam.ended = true;
+      return;
+    }
+    // Otherwise transient — try again on next change.
+    console.warn("save retry needed:", err);
+  }
+}
+
+function updateAnsweredCount() {
+  const answered = Object.values(Exam.answers).filter(a => a.length > 0).length;
+  $("#answered-count").textContent = answered + " / " + Exam.questions.length + " dijawab";
+}
+
+function startExamTimers() {
+  if (Exam.timerHandle) clearInterval(Exam.timerHandle);
+  Exam.timerHandle = setInterval(tickTimer, 500);
+  if (Exam.pollHandle) clearInterval(Exam.pollHandle);
+  // Light poll to pick up locked_until / status changes from the server.
+  Exam.pollHandle = setInterval(pollState, 5000);
+  tickTimer();
+}
+
+function tickTimer() {
+  const now = Date.now();
+  const remaining = Math.max(0, Math.floor((Exam.endsAt - now) / 1000));
+  const el = $("#time-left");
+  el.textContent = fmtTime(remaining);
+  el.classList.toggle("warn", remaining > 0 && remaining < 600);
+  el.classList.toggle("crit", remaining > 0 && remaining < 60);
+
+  // Lock countdown
+  const lock = $("#lock-banner");
+  if (Exam.lockUntil && now < Exam.lockUntil) {
+    const left = Math.ceil((Exam.lockUntil - now) / 1000);
+    lock.classList.remove("hidden");
+    lock.className = "banner-warn";
+    lock.textContent = "Sesi terkunci sementara: " + left + " detik. " +
+                       "Silakan diam dan tunggu.";
+    $$(".choice input").forEach(i => i.disabled = true);
+  } else {
+    if (!lock.classList.contains("hidden")) {
+      lock.classList.add("hidden");
+      $$(".choice input").forEach(i => i.disabled = false);
+    }
+  }
+
+  if (remaining === 0 && !Exam.ended) {
+    Exam.ended = true;
+    autoSubmit("Waktu habis. Mengumpulkan otomatis…");
+  }
+}
+
+async function pollState() {
+  if (Exam.ended) return;
+  try {
+    const s = await API.state(Exam.sessionId);
+    if (s.locked_until) {
+      Exam.lockUntil = Date.parse(s.locked_until + "Z");
+    } else {
+      Exam.lockUntil = null;
+    }
+    if (s.status === "submitted" || s.status === "expelled" || s.status === "panic") {
+      Exam.ended = true;
+      // Server-side terminal — bounce back to picker
+      stopTimers();
+      alert("Sesi telah berakhir: " + s.status);
+      goPicker();
+    }
+  } catch (_) { /* ignore transient poll failures */ }
+}
+
+function stopTimers() {
+  if (Exam.timerHandle) { clearInterval(Exam.timerHandle); Exam.timerHandle = null; }
+  if (Exam.pollHandle)  { clearInterval(Exam.pollHandle);  Exam.pollHandle  = null; }
+  detachAntiCheat();
+}
+
+// ---------------------------------------------------------------------------
+// Anti-cheat listeners (spec §6.1)
+// ---------------------------------------------------------------------------
+function vis() {
+  if (document.hidden && !Exam.ended) reportViolation("tab_switch");
+}
+function fs() {
+  if (!document.fullscreenElement && !Exam.ended) reportViolation("fullscreen_exit");
+}
+function attachAntiCheat() {
+  document.addEventListener("visibilitychange", vis);
+  document.addEventListener("fullscreenchange", fs);
+  // Try to enter fullscreen — needs user gesture, so this may be no-op
+  // when called from a non-click context. We attempt anyway.
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+}
+function detachAntiCheat() {
+  document.removeEventListener("visibilitychange", vis);
+  document.removeEventListener("fullscreenchange", fs);
+}
+
+let _violationInflight = false;
+async function reportViolation(eventType) {
+  if (_violationInflight) return;
+  _violationInflight = true;
+  try {
+    const r = await API.violation(Exam.sessionId, eventType);
+    showViolationBanner(r);
+    if (r.expelled) {
+      Exam.ended = true;
+      stopTimers();
+      alert("Sesi diakhiri karena pelanggaran berulang. Tunjukkan pesan ini ke pengawas.");
+      goPicker();
+    } else if (r.locked_until) {
+      Exam.lockUntil = Date.parse(r.locked_until + "Z");
+    }
+  } catch (_) { /* ignore — server may have already terminated session */ }
+  finally { _violationInflight = false; }
+}
+function showViolationBanner(r) {
+  const el = $("#violation-banner");
+  el.classList.remove("hidden");
+  el.className = r.expelled ? "banner-danger" : "banner-warn";
+  el.textContent =
+    "Pelanggaran #" + r.violation_count + ": " + r.message;
+  if (!r.expelled) {
+    setTimeout(() => el.classList.add("hidden"), 4000);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Submit / panic
+// ---------------------------------------------------------------------------
+$("#submit-btn").addEventListener("click", () => {
+  $("#confirm-modal").classList.remove("hidden");
+});
+$("#confirm-cancel").addEventListener("click", () => {
+  $("#confirm-modal").classList.add("hidden");
+});
+$("#confirm-ok").addEventListener("click", async () => {
+  $("#confirm-modal").classList.add("hidden");
+  await doSubmit("Mengumpulkan jawaban…");
+});
+
+$("#panic-btn").addEventListener("click", () => {
+  $("#panic-modal").classList.remove("hidden");
+});
+$("#panic-cancel").addEventListener("click", () => {
+  $("#panic-modal").classList.add("hidden");
+});
+$("#panic-ok").addEventListener("click", async () => {
+  $("#panic-modal").classList.add("hidden");
+  if (Exam.ended) return;
+  Exam.ended = true;
+  try { await API.panic(Exam.sessionId); } catch (_) {}
+  stopTimers();
+  alert("Sesi darurat dicatat. Tunjukkan layar ini ke pengawas.");
+  goPicker();
+});
+
+async function autoSubmit(msg) { await doSubmit(msg); }
+
+async function doSubmit(_msg) {
+  // Flush any unsent answers.
+  Exam.ended = true;
+  for (const qid of Object.keys(Exam.saveTimers)) {
+    if (Exam.saveTimers[qid]) {
+      clearTimeout(Exam.saveTimers[qid]);
+      try { await API.answer(Exam.sessionId, qid, Exam.answers[qid] || []); }
+      catch (_) {}
+    }
+  }
+  let r;
+  try {
+    r = await API.submit(Exam.sessionId);
+  } catch (err) {
+    alert("Gagal mengumpulkan: " + err.message);
+    Exam.ended = false;  // let user retry
+    return;
+  }
+  stopTimers();
+  $("#result-pct").textContent = (r.percentage || 0).toFixed(0) + "%";
+  $("#result-detail").textContent =
+    "Skor " + r.total_score + " dari " + r.max_score;
+  show("#screen-result");
+}
+
+$("#result-back").addEventListener("click", goPicker);
+
+// ---------------------------------------------------------------------------
+// Boot
+// ---------------------------------------------------------------------------
+(async function boot() {
+  if (!API.token()) {
+    show("#screen-login");
+    return;
+  }
+  // Try to use the existing token; fall back to login on 401.
+  try {
+    await API.available();
+    await goPicker();
+  } catch (err) {
+    if (err.status === 401) { API.clearToken(); show("#screen-login"); }
+    else show("#screen-login");
+  }
+})();
+</script>
+</body>
+</html>
