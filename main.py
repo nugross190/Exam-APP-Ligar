@@ -12,7 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from routers import auth, confirm, exam, teacher, violation
+from routers import admin, auth, confirm, exam, teacher, violation
 
 app = FastAPI(
     title="HADIR Exam App",
@@ -40,6 +40,7 @@ app.include_router(confirm.router)
 app.include_router(exam.router)
 app.include_router(violation.router)
 app.include_router(teacher.router)
+app.include_router(admin.router)
 
 # Static mount for question images uploaded via /teacher/question/{id}/image.
 # In production this should point at a Railway volume or be replaced by an
@@ -47,9 +48,6 @@ app.include_router(teacher.router)
 _upload_dir = Path(os.environ.get("UPLOAD_DIR", "uploads")).resolve()
 _upload_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(_upload_dir)), name="uploads")
-
-# As you build more, uncomment as you go:
-# app.include_router(admin.router)
 
 
 @app.get("/")
