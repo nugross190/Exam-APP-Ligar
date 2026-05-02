@@ -40,7 +40,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import Choice, Exam, Question, Subject, Teacher
+from models import Choice, Exam, Question, Subject, Teacher, TeacherSubject
 from routers.auth import get_current_teacher
 
 router = APIRouter(prefix="/teacher", tags=["teacher"])
@@ -121,15 +121,19 @@ class ImageUploadResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 def _owned_exam(db: Session, exam_id: str, teacher: Teacher) -> Exam:
-    """Return the exam if the teacher owns its subject; else 404.
+    """Return the exam if the teacher is linked to its subject via
+    TeacherSubject; else 404.
 
-    We use 404 (not 403) deliberately — a teacher querying someone else's
-    exam shouldn't even learn that exam exists.
+    Ownership goes through the m:n link table so multiple teachers
+    can share a subject (e.g. 3 Math teachers all author for
+    'Matematika Umum'). 404 (not 403) deliberately — a teacher
+    querying someone else's exam shouldn't even learn it exists.
     """
     exam = (
         db.query(Exam)
         .join(Subject, Exam.subject_id == Subject.id)
-        .filter(Exam.id == exam_id, Subject.teacher_id == teacher.id)
+        .join(TeacherSubject, TeacherSubject.subject_id == Subject.id)
+        .filter(Exam.id == exam_id, TeacherSubject.teacher_id == teacher.id)
         .first()
     )
     if exam is None:
@@ -142,7 +146,8 @@ def _owned_question(db: Session, question_id: str, teacher: Teacher) -> Question
         db.query(Question)
         .join(Exam, Question.exam_id == Exam.id)
         .join(Subject, Exam.subject_id == Subject.id)
-        .filter(Question.id == question_id, Subject.teacher_id == teacher.id)
+        .join(TeacherSubject, TeacherSubject.subject_id == Subject.id)
+        .filter(Question.id == question_id, TeacherSubject.teacher_id == teacher.id)
         .first()
     )
     if q is None:
@@ -238,8 +243,9 @@ def list_my_exams(
     exams = (
         db.query(Exam)
         .join(Subject, Exam.subject_id == Subject.id)
-        .filter(Subject.teacher_id == teacher.id)
-        .order_by(Exam.scheduled_at)
+        .join(TeacherSubject, TeacherSubject.subject_id == Subject.id)
+        .filter(TeacherSubject.teacher_id == teacher.id)
+        .order_by(Subject.name, Exam.scheduled_at)
         .all()
     )
     return [

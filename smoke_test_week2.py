@@ -48,7 +48,7 @@ from main import app
 from models import (
     AnswerChoice, Choice, Class, ClassSubject, Exam, ExamResult,
     ExamSession, ExpelledFlag, Question, SessionViolation, Student,
-    StudentAnswer, Subject, Teacher,
+    StudentAnswer, Subject, Teacher, TeacherSubject,
 )
 
 client = TestClient(app)
@@ -156,8 +156,18 @@ try:
         db.add(admin)
         db.flush()
 
-    # Wire teacher to the chosen subject so they own it.
-    chosen_subject.teacher_id = teacher.id
+    # Wire teacher to the chosen subject so they own it. Authoring
+    # ownership flows through TeacherSubject; the legacy
+    # Subject.teacher_id is left as-is.
+    existing_link = (
+        db.query(TeacherSubject)
+        .filter_by(teacher_id=teacher.id, subject_id=chosen_subject.id)
+        .first()
+    )
+    if existing_link is None:
+        db.add(TeacherSubject(
+            teacher_id=teacher.id, subject_id=chosen_subject.id,
+        ))
 
     # Reset exam state — admin_confirmed False so /admin/exam/{id}/confirm
     # has something to flip; window includes "now" so /exam/start works.

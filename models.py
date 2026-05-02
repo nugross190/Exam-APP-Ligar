@@ -50,7 +50,18 @@ class Teacher(Base):
     full_name = Column(String(100), nullable=False)
     role = Column(String(20), nullable=False)  # 'teacher'|'admin'|'owner'|'homeroom'
 
+    # Legacy 1:N — first teacher to claim a subject. Authoring ownership
+    # actually flows through TeacherSubject below (so multiple teachers
+    # can share a subject), but we keep this around for admin reports
+    # that want a single 'primary teacher' per subject.
     subjects = relationship("Subject", back_populates="teacher")
+    # Multi-subject and multi-teacher: a Math department with three
+    # teachers all author for 'Matematika Umum' via three TeacherSubject
+    # rows. Each teacher's portal lists exams via this link table.
+    subject_links = relationship(
+        "TeacherSubject", back_populates="teacher",
+        cascade="all, delete-orphan",
+    )
 
 
 class Student(Base):
@@ -85,6 +96,26 @@ class Subject(Base):
     teacher = relationship("Teacher", back_populates="subjects")
     exams = relationship("Exam", back_populates="subject")
     class_subjects = relationship("ClassSubject", back_populates="subject")
+    teacher_links = relationship(
+        "TeacherSubject", back_populates="subject",
+        cascade="all, delete-orphan",
+    )
+
+
+class TeacherSubject(Base):
+    """Many-to-many between Teacher and Subject. Authoring ownership
+    flows through this table so e.g. all three Math teachers can write
+    questions for 'Matematika Umum'."""
+    __tablename__ = "teacher_subjects"
+    __table_args__ = (
+        UniqueConstraint("teacher_id", "subject_id", name="uq_teacher_subject"),
+    )
+    id = Column(String(36), primary_key=True, default=_uuid)
+    teacher_id = Column(String(36), ForeignKey("teachers.id"), nullable=False)
+    subject_id = Column(String(36), ForeignKey("subjects.id"), nullable=False)
+
+    teacher = relationship("Teacher", back_populates="subject_links")
+    subject = relationship("Subject", back_populates="teacher_links")
 
 
 class ClassSubject(Base):

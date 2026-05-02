@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HADIR — Portal Guru</title>
+<style>
+:root {
+  --bg: #f4f5f7;
+  --panel: #fff;
+  --ink: #1f2328;
+  --muted: #57606a;
+  --border: #d0d7de;
+  --accent: #0d6efd;
+  --accent-ink: #fff;
+  --warn: #b54708;
+  --warn-bg: #fef3c7;
+  --danger: #b42318;
+  --danger-bg: #fee4e2;
+  --ok: #067647;
+  --ok-bg: #dcfae6;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; min-height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+.app { max-width: 1100px; margin: 0 auto; padding: 16px; }
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; margin: -16px -16px 16px;
+  background: var(--accent); color: var(--accent-ink);
+  flex-wrap: wrap; gap: 8px;
+}
+header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+header .who { font-size: 14px; opacity: .9; }
+header .who button {
+  background: rgba(255,255,255,.15); color: var(--accent-ink);
+  margin-left: 12px; padding: 6px 10px; font-size: 13px;
+}
+.panel {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 20px; margin-bottom: 16px;
+}
+h2 { margin: 0 0 12px; font-size: 18px; }
+h3 { margin: 0 0 8px; font-size: 16px; }
+p.muted { color: var(--muted); margin: 0 0 16px; font-size: 14px; }
+label { display: block; font-size: 14px; margin: 12px 0 4px; color: var(--muted); }
+input[type=text], input[type=password], input[type=number], textarea, select {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 15px; font-family: inherit;
+  background: var(--panel);
+}
+textarea { min-height: 80px; resize: vertical; }
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent);
+}
+button {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 16px; border: 0; border-radius: 8px;
+  font-size: 15px; font-weight: 500; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink);
+  font-family: inherit;
+}
+button:active { transform: translateY(1px); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--border); }
+button.danger { background: var(--danger); }
+button.small { padding: 6px 10px; font-size: 13px; }
+button.full { width: 100%; }
+.error {
+  color: var(--danger); background: var(--danger-bg);
+  padding: 10px 12px; border-radius: 8px; font-size: 14px;
+  margin: 12px 0;
+}
+.banner-warn {
+  background: var(--warn-bg); color: var(--warn);
+  padding: 12px 14px; border-radius: var(--radius); margin-bottom: 12px;
+  font-size: 14px;
+}
+.layout {
+  display: grid; gap: 16px;
+  grid-template-columns: 320px 1fr;
+}
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+}
+.subject-block { margin-bottom: 24px; }
+.subject-block h3 {
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: 1px solid var(--border); padding-bottom: 6px;
+}
+.exam-list { list-style: none; padding: 0; margin: 0; }
+.exam-list li {
+  padding: 10px 12px; margin-bottom: 6px;
+  border: 1px solid var(--border); border-radius: 8px;
+  cursor: pointer; transition: background .1s;
+}
+.exam-list li:hover { background: #f6f8fa; }
+.exam-list li.active {
+  background: #dbeafe; border-color: var(--accent);
+}
+.exam-list .title { font-weight: 500; font-size: 15px; }
+.exam-list .meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.status-pill {
+  display: inline-block; padding: 1px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 500;
+}
+.pill-confirmed { color: var(--ok); background: var(--ok-bg); }
+.pill-draft     { color: var(--muted); background: #eef0f2; }
+
+.q-card {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; margin-bottom: 10px; background: var(--panel);
+}
+.q-card .q-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 8px;
+}
+.q-card .q-no {
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.q-card .q-body { font-size: 15px; white-space: pre-wrap; margin: 4px 0 8px; }
+.q-card img { max-width: 100%; border-radius: 6px; margin: 6px 0; }
+.q-card .q-choices { list-style: none; padding: 0; margin: 0; }
+.q-card .q-choices li {
+  padding: 6px 10px; border-radius: 6px; font-size: 14px;
+}
+.q-card .q-choices li.correct {
+  background: var(--ok-bg); color: var(--ok); font-weight: 500;
+}
+.q-card .q-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; padding: 16px; overflow-y: auto;
+}
+.modal {
+  background: var(--panel); border-radius: var(--radius);
+  padding: 24px; max-width: 600px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+}
+.choice-row {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 6px;
+}
+.choice-row input[type=text] { flex: 1; }
+.choice-row label.chk {
+  display: flex; align-items: center; gap: 6px; margin: 0;
+  white-space: nowrap; font-size: 14px;
+}
+.row { display: flex; gap: 8px; }
+.row > * { flex: 1; }
+.hidden { display: none !important; }
+.pad { margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>HADIR — Portal Guru</h1>
+    <span class="who" id="whoami">
+      <span id="whoname"></span>
+      <button id="logout-btn" class="hidden">Keluar</button>
+    </span>
+  </header>
+
+  <!-- ======= Login ======= -->
+  <section class="panel" id="screen-login">
+    <h2>Masuk Sebagai Guru</h2>
+    <p class="muted">Gunakan NIP (tanpa spasi) dan 6 digit terakhir NIP sebagai kata sandi awal.</p>
+    <form id="login-form">
+      <label for="username">NIP</label>
+      <input id="username" name="username" type="text" autocomplete="username" required>
+      <label for="password">Kata Sandi</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <div class="error hidden" id="login-error"></div>
+      <button type="submit" class="full" style="margin-top:16px">Masuk</button>
+    </form>
+  </section>
+
+  <!-- ======= Portal ======= -->
+  <section class="panel hidden" id="screen-portal" style="background:transparent;border:0;box-shadow:none;padding:0">
+    <div class="layout">
+      <!-- Left: subjects + exams -->
+      <aside>
+        <div class="panel" id="empty-state" style="display:none">
+          <h2>Belum Ada Mata Pelajaran</h2>
+          <p class="muted">
+            Akun Anda belum dikaitkan dengan mata pelajaran apa pun.
+            Hubungi admin untuk menugaskan Anda ke mata pelajaran yang
+            akan diajarkan.
+          </p>
+        </div>
+        <div id="subjects-host"></div>
+      </aside>
+
+      <!-- Right: questions for selected exam -->
+      <main>
+        <div class="panel" id="no-selection">
+          <h2>Pilih Ujian</h2>
+          <p class="muted">
+            Pilih salah satu ujian di sebelah kiri untuk melihat dan
+            menyusun soalnya.
+          </p>
+        </div>
+
+        <div class="panel hidden" id="questions-panel">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div>
+              <h2 id="exam-title"></h2>
+              <p class="muted" id="exam-meta"></p>
+            </div>
+            <button id="add-question-btn">+ Tambah Soal</button>
+          </div>
+          <div id="frozen-banner" class="banner-warn hidden">
+            Ujian ini sudah dikonfirmasi admin. Soal tidak bisa diubah lagi.
+          </div>
+          <div id="q-list"></div>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- ======= Modal: Question editor ======= -->
+  <div class="modal-bg hidden" id="q-modal">
+    <div class="modal">
+      <h2 id="q-modal-title">Tambah Soal</h2>
+      <div class="row">
+        <div>
+          <label>Tipe Soal</label>
+          <select id="q-type">
+            <option value="pg">Pilihan Ganda (1 benar)</option>
+            <option value="tf">Benar/Salah</option>
+            <option value="complex_mc">Multi-pilihan (lebih dari 1 benar)</option>
+          </select>
+        </div>
+        <div>
+          <label>Poin</label>
+          <input type="number" id="q-points" min="1" max="100" step="1" value="10">
+        </div>
+        <div>
+          <label>Jumlah Pilihan</label>
+          <select id="q-choices-count"></select>
+        </div>
+      </div>
+
+      <label>Pertanyaan</label>
+      <textarea id="q-body" placeholder="Tulis pertanyaan di sini..."></textarea>
+
+      <label style="margin-top:14px">Pilihan Jawaban (centang yang benar)</label>
+      <div id="q-choices"></div>
+
+      <label style="margin-top:14px">Gambar (opsional, jpg/png, akan diunggah setelah soal disimpan)</label>
+      <input type="file" id="q-image" accept="image/jpeg,image/png">
+
+      <div class="error hidden" id="q-error"></div>
+
+      <div class="row" style="margin-top:18px">
+        <button class="ghost" id="q-cancel">Batal</button>
+        <button id="q-save">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+// ---------------------------------------------------------------------------
+// API client
+// ---------------------------------------------------------------------------
+const API = {
+  base: "",
+  token: () => localStorage.getItem("hadir_teacher_jwt"),
+  setToken: t => localStorage.setItem("hadir_teacher_jwt", t),
+  clearToken: () => localStorage.removeItem("hadir_teacher_jwt"),
+
+  async req(method, path, body, opts) {
+    const headers = { "Accept": "application/json" };
+    const t = API.token();
+    if (t) headers["Authorization"] = "Bearer " + t;
+    const init = { method, headers };
+    if (body !== undefined) {
+      headers["Content-Type"] = "application/json";
+      init.body = JSON.stringify(body);
+    }
+    const res = await fetch(API.base + path, init);
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch { data = { detail: text }; }
+    if (!res.ok) {
+      const err = new Error((data && data.detail) || res.statusText);
+      err.status = res.status; err.data = data;
+      throw err;
+    }
+    return data;
+  },
+
+  async upload(path, file) {
+    const fd = new FormData(); fd.append("file", file);
+    const headers = { "Authorization": "Bearer " + API.token() };
+    const res = await fetch(API.base + path, { method: "POST", headers, body: fd });
+    const text = await res.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch { data = { detail: text }; }
+    if (!res.ok) {
+      const err = new Error((data && data.detail) || res.statusText);
+      err.status = res.status; throw err;
+    }
+    return data;
+  },
+
+  login: (u, p) => API.req("POST", "/auth/teacher/login", { username: u, password: p }),
+  exams: () => API.req("GET", "/teacher/exams"),
+  questions: (exam_id) => API.req("GET", `/teacher/exam/${exam_id}/questions`),
+  createQ: (exam_id, payload) =>
+    API.req("POST", `/teacher/exam/${exam_id}/question`, payload),
+  updateQ: (qid, payload) => API.req("PUT", `/teacher/question/${qid}`, payload),
+  uploadImage: (qid, file) => API.upload(`/teacher/question/${qid}/image`, file),
+};
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+function show(id) {
+  ["#screen-login", "#screen-portal"].forEach(s => $(s).classList.add("hidden"));
+  $(id).classList.remove("hidden");
+}
+function setError(id, msg) {
+  const el = $(id);
+  if (!msg) { el.classList.add("hidden"); el.textContent = ""; return; }
+  el.classList.remove("hidden");
+  el.textContent = msg;
+}
+
+// ---------------------------------------------------------------------------
+// Login
+// ---------------------------------------------------------------------------
+$("#login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  setError("#login-error", "");
+  try {
+    const data = await API.login(
+      $("#username").value.trim(),
+      $("#password").value,
+    );
+    if (!["teacher", "admin", "owner", "homeroom"].includes(data.role)) {
+      throw new Error("Akun ini bukan akun guru.");
+    }
+    API.setToken(data.access_token);
+    sessionStorage.setItem("hadir_t_name", data.name);
+    sessionStorage.setItem("hadir_t_role", data.role);
+    await goPortal();
+  } catch (err) {
+    setError("#login-error", err.message || "Gagal masuk.");
+  }
+});
+
+$("#logout-btn").addEventListener("click", () => {
+  API.clearToken();
+  sessionStorage.clear();
+  $("#whoname").textContent = "";
+  $("#logout-btn").classList.add("hidden");
+  show("#screen-login");
+});
+
+// ---------------------------------------------------------------------------
+// Portal: list exams grouped by subject
+// ---------------------------------------------------------------------------
+const State = {
+  examsBySubject: {},   // { subjectName: [ examRow, ... ] }
+  selectedExamId: null,
+  selectedExam: null,
+  questions: [],
+};
+
+async function goPortal() {
+  show("#screen-portal");
+  $("#whoname").textContent = sessionStorage.getItem("hadir_t_name") || "";
+  $("#logout-btn").classList.remove("hidden");
+
+  let exams;
+  try { exams = await API.exams(); }
+  catch (err) {
+    if (err.status === 401) { API.clearToken(); show("#screen-login"); return; }
+    alert("Gagal memuat ujian: " + err.message); return;
+  }
+
+  // Group by subject so multi-subject teachers see them sectioned.
+  State.examsBySubject = {};
+  exams.forEach(e => {
+    (State.examsBySubject[e.subject_name] ||= []).push(e);
+  });
+
+  renderSubjects();
+}
+
+function renderSubjects() {
+  const host = $("#subjects-host");
+  host.innerHTML = "";
+  const empty = $("#empty-state");
+  const subjects = Object.keys(State.examsBySubject).sort();
+  if (subjects.length === 0) {
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  for (const subj of subjects) {
+    const block = document.createElement("div");
+    block.className = "panel subject-block";
+    const h3 = document.createElement("h3");
+    h3.innerHTML = `<span>${escapeHtml(subj)}</span>` +
+      `<span class="muted" style="font-size:12px">${State.examsBySubject[subj].length} ujian</span>`;
+    block.appendChild(h3);
+
+    const ul = document.createElement("ul");
+    ul.className = "exam-list";
+    State.examsBySubject[subj].forEach(e => {
+      const li = document.createElement("li");
+      li.dataset.examId = e.id;
+      const dt = new Date(e.scheduled_at);
+      const localTime = dt.toLocaleString("id-ID",
+        { dateStyle: "medium", timeStyle: "short" });
+      const pill = e.admin_confirmed
+        ? '<span class="status-pill pill-confirmed">Dikonfirmasi</span>'
+        : '<span class="status-pill pill-draft">Draf</span>';
+      li.innerHTML = `
+        <div class="title">${escapeHtml(e.title)}</div>
+        <div class="meta">${localTime} · ${e.duration_minutes} mnt · ${e.question_count} soal · ${pill}</div>
+      `;
+      li.addEventListener("click", () => selectExam(e.id));
+      if (e.id === State.selectedExamId) li.classList.add("active");
+      ul.appendChild(li);
+    });
+    block.appendChild(ul);
+    host.appendChild(block);
+  }
+}
+
+async function selectExam(examId) {
+  State.selectedExamId = examId;
+  // Find the exam row across the grouped map
+  let chosen = null;
+  for (const arr of Object.values(State.examsBySubject)) {
+    const m = arr.find(x => x.id === examId);
+    if (m) { chosen = m; break; }
+  }
+  State.selectedExam = chosen;
+  $$("#subjects-host .exam-list li").forEach(li => {
+    li.classList.toggle("active", li.dataset.examId === examId);
+  });
+  await loadQuestions();
+}
+
+async function loadQuestions() {
+  $("#no-selection").classList.add("hidden");
+  $("#questions-panel").classList.remove("hidden");
+  const e = State.selectedExam;
+  $("#exam-title").textContent = e.title;
+  const dt = new Date(e.scheduled_at);
+  const localTime = dt.toLocaleString("id-ID",
+    { dateStyle: "long", timeStyle: "short" });
+  $("#exam-meta").textContent =
+    `${e.subject_name} · ${localTime} · ${e.duration_minutes} menit`;
+
+  $("#frozen-banner").classList.toggle("hidden", !e.admin_confirmed);
+  $("#add-question-btn").disabled = e.admin_confirmed;
+
+  let qs;
+  try { qs = await API.questions(e.id); }
+  catch (err) {
+    if (err.status === 401) { API.clearToken(); show("#screen-login"); return; }
+    alert("Gagal memuat soal: " + err.message); return;
+  }
+  State.questions = qs;
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const root = $("#q-list");
+  root.innerHTML = "";
+  if (!State.questions.length) {
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = "Belum ada soal. Klik “+ Tambah Soal”.";
+    root.appendChild(p);
+    return;
+  }
+  State.questions.forEach((q, idx) => {
+    const card = document.createElement("div"); card.className = "q-card";
+    const head = document.createElement("div"); head.className = "q-head";
+    const no = document.createElement("span"); no.className = "q-no";
+    no.textContent = `Soal ${idx + 1} · ${q.question_type.toUpperCase()} · ${q.item_points} pt`;
+    head.appendChild(no);
+    card.appendChild(head);
+
+    const body = document.createElement("div"); body.className = "q-body";
+    body.textContent = q.body;
+    card.appendChild(body);
+
+    if (q.image_url) {
+      const img = document.createElement("img");
+      img.src = q.image_url; img.alt = "";
+      card.appendChild(img);
+    }
+
+    const ul = document.createElement("ul"); ul.className = "q-choices";
+    q.choices.forEach(c => {
+      const li = document.createElement("li");
+      if (c.is_correct) li.classList.add("correct");
+      li.textContent = (c.is_correct ? "✓ " : "✗ ") + c.body;
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+
+    if (!State.selectedExam.admin_confirmed) {
+      const actions = document.createElement("div"); actions.className = "q-actions";
+      const editBtn = document.createElement("button");
+      editBtn.className = "ghost small"; editBtn.textContent = "Edit";
+      editBtn.addEventListener("click", () => openEditor(q));
+      actions.appendChild(editBtn);
+      card.appendChild(actions);
+    }
+
+    root.appendChild(card);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Question editor modal
+// ---------------------------------------------------------------------------
+const Editor = { editingId: null };
+
+$("#add-question-btn").addEventListener("click", () => openEditor(null));
+$("#q-cancel").addEventListener("click", () => $("#q-modal").classList.add("hidden"));
+$("#q-type").addEventListener("change", () => {
+  syncChoicesCountOptions();
+  rebuildChoiceRows();
+});
+$("#q-choices-count").addEventListener("change", rebuildChoiceRows);
+$("#q-save").addEventListener("click", saveQuestion);
+
+function syncChoicesCountOptions() {
+  const sel = $("#q-choices-count");
+  const type = $("#q-type").value;
+  sel.innerHTML = "";
+  const opts = type === "tf" ? [2] : [4, 5];
+  opts.forEach(n => {
+    const o = document.createElement("option");
+    o.value = n; o.textContent = n;
+    sel.appendChild(o);
+  });
+}
+
+function rebuildChoiceRows(prefill) {
+  const host = $("#q-choices"); host.innerHTML = "";
+  const type = $("#q-type").value;
+  const n = parseInt($("#q-choices-count").value, 10);
+  const multi = type === "complex_mc";
+  for (let i = 0; i < n; i++) {
+    const row = document.createElement("div"); row.className = "choice-row";
+    const idx = document.createElement("span");
+    idx.style.cssText = "width:24px;color:var(--muted);font-size:13px";
+    idx.textContent = String.fromCharCode(65 + i) + ".";
+    const txt = document.createElement("input");
+    txt.type = "text"; txt.placeholder = "Isi pilihan jawaban";
+    if (type === "tf" && !prefill) {
+      txt.value = i === 0 ? "Benar" : "Salah";
+    }
+    if (prefill && prefill[i]) txt.value = prefill[i].body || "";
+    const lab = document.createElement("label"); lab.className = "chk";
+    const chk = document.createElement("input");
+    chk.type = multi ? "checkbox" : "radio";
+    chk.name = "q-correct";
+    if (prefill && prefill[i]) chk.checked = !!prefill[i].is_correct;
+    lab.appendChild(chk);
+    lab.appendChild(document.createTextNode("benar"));
+    row.appendChild(idx); row.appendChild(txt); row.appendChild(lab);
+    host.appendChild(row);
+  }
+}
+
+function openEditor(q) {
+  Editor.editingId = q ? q.id : null;
+  $("#q-modal-title").textContent = q ? "Edit Soal" : "Tambah Soal";
+  setError("#q-error", "");
+  $("#q-image").value = "";
+
+  if (q) {
+    $("#q-type").value = q.question_type;
+    syncChoicesCountOptions();
+    $("#q-choices-count").value = q.choices_count;
+    $("#q-points").value = q.item_points;
+    $("#q-body").value = q.body;
+    rebuildChoiceRows(q.choices);
+  } else {
+    $("#q-type").value = "pg";
+    syncChoicesCountOptions();
+    $("#q-choices-count").value = 4;
+    $("#q-points").value = 10;
+    $("#q-body").value = "";
+    rebuildChoiceRows();
+  }
+  $("#q-modal").classList.remove("hidden");
+}
+
+async function saveQuestion() {
+  const type = $("#q-type").value;
+  const points = parseFloat($("#q-points").value);
+  const choicesCount = parseInt($("#q-choices-count").value, 10);
+  const body = $("#q-body").value.trim();
+  if (!body) { setError("#q-error", "Pertanyaan tidak boleh kosong."); return; }
+
+  const rows = $("#q-choices").querySelectorAll(".choice-row");
+  const choices = [];
+  let correctCount = 0;
+  rows.forEach(r => {
+    const txt = r.querySelector('input[type=text]').value.trim();
+    const chk = r.querySelector('label.chk input').checked;
+    choices.push({ body: txt, is_correct: chk });
+    if (chk) correctCount += 1;
+  });
+  if (choices.some(c => !c.body)) {
+    setError("#q-error", "Semua pilihan harus diisi."); return;
+  }
+  if (correctCount < 1) {
+    setError("#q-error", "Pilih setidaknya satu jawaban yang benar."); return;
+  }
+  if ((type === "pg" || type === "tf") && correctCount !== 1) {
+    setError("#q-error", `Tipe ${type.toUpperCase()} harus tepat satu jawaban benar.`);
+    return;
+  }
+
+  const payload = {
+    question_type: type,
+    body,
+    item_points: points,
+    choices_count: choicesCount,
+    choices,
+  };
+
+  $("#q-save").disabled = true;
+  try {
+    let qid;
+    if (Editor.editingId) {
+      const r = await API.updateQ(Editor.editingId, payload);
+      qid = r.id;
+    } else {
+      const r = await API.createQ(State.selectedExamId, payload);
+      qid = r.question_id;
+    }
+    // Optional image upload
+    const file = $("#q-image").files[0];
+    if (file) await API.uploadImage(qid, file);
+
+    $("#q-modal").classList.add("hidden");
+    await loadQuestions();
+    // Refresh exam list so question_count badges update
+    State.examsBySubject = {}; // force re-fetch on next render
+    const exams = await API.exams();
+    exams.forEach(e => (State.examsBySubject[e.subject_name] ||= []).push(e));
+    renderSubjects();
+  } catch (err) {
+    setError("#q-error", err.message || "Gagal menyimpan.");
+  } finally {
+    $("#q-save").disabled = false;
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;",
+  }[c]));
+}
+
+// ---------------------------------------------------------------------------
+// Boot
+// ---------------------------------------------------------------------------
+(async function boot() {
+  if (!API.token()) { show("#screen-login"); return; }
+  try { await goPortal(); }
+  catch (_) { API.clearToken(); show("#screen-login"); }
+})();
+</script>
+</body>
+</html>

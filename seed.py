@@ -15,6 +15,9 @@ in until the kurikulum team fixes the source data. Same for username.
 from __future__ import annotations
 
 import argparse
+import difflib
+import json
+import re
 import sys
 from datetime import datetime
 from typing import Iterable
@@ -27,7 +30,8 @@ from sqlalchemy.orm import Session
 sys.path.insert(0, ".")
 from database import SessionLocal, engine
 from models import (
-    Base, Class, ClassSubject, Exam, Student, Subject,
+    Base, Class, ClassSubject, Exam, Student, Subject, Teacher,
+    TeacherSubject,
 )
 from parsers.excel import (
     StudentRow, ScheduleEntry,
@@ -239,6 +243,152 @@ def seed_class_subjects(
 
 
 # ---------------------------------------------------------------------------
+# §3.4  seed_teachers (from database/teachers.json)
+# ---------------------------------------------------------------------------
+
+# Subject names with this prefix (or that match these literal strings) aren't
+# real subjects — Kepala Sekolah / Wakil Kepala / Bimbingan Konseling etc.
+# We don't try to link them; they'd never have an Exam row anyway.
+_NON_SUBJECT_NAMES = {
+    "kepala sekolah",
+    "wakil kepala sekolah",
+    "wakil kepala kurikulum",
+    "wakil kepala kesiswaan",
+    "wakil kepala humas",
+    "wakil kepala sarana prasarana",
+    "kepala perpustakaan",
+    "kepala laboratorium",
+    "bimbingan konseling",
+    "operator",
+    "tata usaha",
+}
+
+
+def _digits_only(s: str) -> str:
+    return re.sub(r"\D", "", s or "")
+
+
+def _norm_name(s: str) -> str:
+    """Lowercase + collapse whitespace. Used for subject-name matching
+    so 'Bahasa Indonesia ' and 'bahasa  indonesia' both match."""
+    return re.sub(r"\s+", " ", (s or "").lower().strip())
+
+
+def _fuzzy_subject_match(target: str, db_subjects: dict[str, Subject]) -> Subject | None:
+    """Return the closest-matching Subject row for `target`, or None.
+
+    Uses difflib at threshold 0.85 — high enough to catch typos like
+    'Bahaasa Indonesia' vs 'Bahasa Indonesia' but not so loose that
+    'Matematika Umum' matches 'Matematika Peminatan'.
+    """
+    nt = _norm_name(target)
+    norm_keys = list(db_subjects.keys())
+    best = difflib.get_close_matches(nt, norm_keys, n=1, cutoff=0.85)
+    return db_subjects[best[0]] if best else None
+
+
+def seed_teachers(json_path: str, db: Session) -> dict:
+    """Idempotent. Creates/updates Teacher rows from a JSON file shaped:
+
+        [{"kode": int, "nama": str, "nip": str (with spaces),
+          "status": "PNS"|"PPPK"|...,
+          "mata_pelajaran": [{"sub_kode": str, "mapel": str}, ...]}, ...]
+
+    Username = NIP digits-only (uniquely school-issued, never collides).
+    Initial password = last 6 digits of NIP — parallel to the student
+    NISN-last-6 rule. Override SEED_BCRYPT_ROUNDS just like the student
+    seeder does.
+
+    Each (teacher, mapel) pair writes a TeacherSubject row, allowing
+    multiple teachers to share a subject (the school has e.g. three
+    Math teachers). The legacy Subject.teacher_id is also set for the
+    first teacher to claim a subject, since admin reports use it as a
+    'primary teacher' label.
+    """
+    stats = {
+        "teachers_created": 0,
+        "teachers_updated": 0,
+        "subject_links_created": 0,
+        "subject_links_existed": 0,
+        "subjects_unmatched": 0,
+        "non_subject_skipped": 0,
+    }
+
+    with open(json_path, encoding="utf-8") as f:
+        data = json.load(f)
+
+    # Build a dict keyed by normalized subject name so lookups handle
+    # whitespace + case differences without difflib.
+    db_subjects = {
+        _norm_name(s.name): s
+        for s in db.query(Subject).all()
+    }
+
+    for entry in data:
+        nip_digits = _digits_only(entry.get("nip", ""))
+        if not nip_digits:
+            print(f"  skip: no NIP for {entry.get('nama')!r}", file=sys.stderr)
+            continue
+
+        existing = db.query(Teacher).filter_by(username=nip_digits).first()
+        if existing is None:
+            init_pw = nip_digits[-6:] if len(nip_digits) >= 6 else nip_digits
+            t = Teacher(
+                username=nip_digits,
+                password_hash=_hash_password(init_pw),
+                full_name=entry.get("nama", "").strip(),
+                role="teacher",
+            )
+            db.add(t)
+            db.flush()
+            stats["teachers_created"] += 1
+        else:
+            t = existing
+            new_name = entry.get("nama", "").strip()
+            if new_name and t.full_name != new_name:
+                t.full_name = new_name
+                stats["teachers_updated"] += 1
+
+        for m in entry.get("mata_pelajaran", []):
+            mapel = (m.get("mapel") or "").strip()
+            if not mapel:
+                continue
+            n_mapel = _norm_name(mapel)
+            if n_mapel in _NON_SUBJECT_NAMES:
+                stats["non_subject_skipped"] += 1
+                continue
+
+            subj = db_subjects.get(n_mapel) or _fuzzy_subject_match(mapel, db_subjects)
+            if subj is None:
+                stats["subjects_unmatched"] += 1
+                print(
+                    f"  unmatched subject: {mapel!r}  (teacher: {t.full_name})",
+                    file=sys.stderr,
+                )
+                continue
+
+            # Set legacy 1:N pointer for the first teacher to claim
+            # this subject — kept around for admin "primary teacher"
+            # views; authoring flows through TeacherSubject.
+            if subj.teacher_id is None:
+                subj.teacher_id = t.id
+
+            existing_link = (
+                db.query(TeacherSubject)
+                .filter_by(teacher_id=t.id, subject_id=subj.id)
+                .first()
+            )
+            if existing_link is None:
+                db.add(TeacherSubject(teacher_id=t.id, subject_id=subj.id))
+                stats["subject_links_created"] += 1
+            else:
+                stats["subject_links_existed"] += 1
+
+    db.flush()
+    return stats
+
+
+# ---------------------------------------------------------------------------
 # CLI entrypoint
 # ---------------------------------------------------------------------------
 
@@ -247,6 +397,9 @@ def main():
     ap.add_argument("--xi", required=True, help="Path to grade XI roster xlsx")
     ap.add_argument("--x", required=True, help="Path to grade X roster xlsx")
     ap.add_argument("--schedule", required=True, help="Path to schedule xlsx")
+    ap.add_argument("--teachers", default=None,
+                    help="Optional path to teachers.json (creates Teacher rows "
+                         "and wires Subject.teacher_id)")
     ap.add_argument("--dry-run", action="store_true",
                     help="Parse only, print summary, no DB writes")
     ap.add_argument("--create-tables", action="store_true",
@@ -295,6 +448,11 @@ def main():
         print("\n== seed_class_subjects ==")
         s3 = seed_class_subjects(class_subjects, db)
         print(f"  {s3}")
+
+        if args.teachers:
+            print("\n== seed_teachers ==")
+            s4 = seed_teachers(args.teachers, db)
+            print(f"  {s4}")
 
         db.commit()
         print("\n== Committed. ==")
