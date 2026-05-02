@@ -1,4 +1,196 @@
 kelas,subject,date,time_start,time_end
+X - A,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - A,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - A,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - A,Matematika,2025-12-9,07:30,09:00
+X - A,Bahasa Inggris,2025-12-9,09:30,11:00
+X - A,Penjasorkes,2025-12-9,11:30,13:00
+X - A,Biologi,2025-12-10,07:30,09:00
+X - A,Sejarah,2025-12-10,09:30,11:00
+X - A,Kimia,2025-12-10,11:30,13:00
+X - A,Sosiologi,2025-12-11,07:30,09:00
+X - A,Bahasa Sunda,2025-12-11,09:30,11:00
+X - A,Fisika,2025-12-11,11:30,13:00
+X - A,Informatika,2025-12-12,07:30,09:00
+X - A,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
+X - A,Ekonomi,2025-12-13,07:30,09:00
+X - A,Geografi,2025-12-13,09:30,11:00
+X - B,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - B,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - B,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - B,Matematika,2025-12-9,07:30,09:00
+X - B,Bahasa Inggris,2025-12-9,09:30,11:00
+X - B,Penjasorkes,2025-12-9,11:30,13:00
+X - B,Biologi,2025-12-10,07:30,09:00
+X - B,Sejarah,2025-12-10,09:30,11:00
+X - B,Kimia,2025-12-10,11:30,13:00
+X - B,Sosiologi,2025-12-11,07:30,09:00
+X - B,Bahasa Sunda,2025-12-11,09:30,11:00
+X - B,Fisika,2025-12-11,11:30,13:00
+X - B,Informatika,2025-12-12,07:30,09:00
+X - B,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
+X - B,Ekonomi,2025-12-13,07:30,09:00
+X - B,Geografi,2025-12-13,09:30,11:00
+X - C,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - C,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - C,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - C,Matematika,2025-12-9,07:30,09:00
+X - C,Bahasa Inggris,2025-12-9,09:30,11:00
+X - C,Penjasorkes,2025-12-9,11:30,13:00
+X - C,Biologi,2025-12-10,07:30,09:00
+X - C,Sejarah,2025-12-10,09:30,11:00
+X - C,Kimia,2025-12-10,11:30,13:00
+X - C,Sosiologi,2025-12-11,07:30,09:00
+X - C,Bahasa Sunda,2025-12-11,09:30,11:00
+X - C,Fisika,2025-12-11,11:30,13:00
+X - C,Informatika,2025-12-12,07:30,09:00
+X - C,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
+X - C,Ekonomi,2025-12-13,07:30,09:00
+X - C,Geografi,2025-12-13,09:30,11:00
+X - D,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - D,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - D,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - D,Matematika,2025-12-9,07:30,09:00
+X - D,Bahasa Inggris,2025-12-9,09:30,11:00
+X - D,Penjasorkes,2025-12-9,11:30,13:00
+X - D,Biologi,2025-12-10,07:30,09:00
+X - D,Sejarah,2025-12-10,09:30,11:00
+X - D,Kimia,2025-12-10,11:30,13:00
+X - D,Sosiologi,2025-12-11,07:30,09:00
+X - D,Bahasa Sunda,2025-12-11,09:30,11:00
+X - D,Fisika,2025-12-11,11:30,13:00
+X - D,Informatika,2025-12-12,07:30,09:00
+X - D,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
+X - D,Ekonomi,2025-12-13,07:30,09:00
+X - D,Geografi,2025-12-13,09:30,11:00
+X - E,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - E,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - E,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - E,Matematika,2025-12-9,07:30,09:00
+X - E,Bahasa Inggris,2025-12-9,09:30,11:00
+X - E,Penjasorkes,2025-12-9,11:30,13:00
+X - E,Biologi,2025-12-10,07:30,09:00
+X - E,Sejarah,2025-12-10,09:30,11:00
+X - E,Kimia,2025-12-10,11:30,13:00
+X - E,Sosiologi,2025-12-11,07:30,09:00
+X - E,Bahasa Sunda,2025-12-11,09:30,11:00
+X - E,Fisika,2025-12-11,11:30,13:00
+X - E,Informatika,2025-12-12,07:30,09:00
+X - E,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
+X - E,Ekonomi,2025-12-13,07:30,09:00
+X - E,Geografi,2025-12-13,09:30,11:00
+X - F,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - F,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - F,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - F,Matematika,2025-12-9,07:30,09:00
+X - F,Bahasa Inggris,2025-12-9,09:30,11:00
+X - F,Penjasorkes,2025-12-9,11:30,13:00
+X - F,Biologi,2025-12-10,07:30,09:00
+X - F,Sejarah,2025-12-10,09:30,11:00
+X - F,Kimia,2025-12-10,11:30,13:00
+X - F,Sosiologi,2025-12-11,07:30,09:00
+X - F,Bahasa Sunda,2025-12-11,09:30,11:00
+X - F,Fisika,2025-12-11,11:30,13:00
+X - F,Informatika,2025-12-12,07:30,09:00
+X - F,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
+X - F,Ekonomi,2025-12-13,07:30,09:00
+X - F,Geografi,2025-12-13,09:30,11:00
+X - G,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - G,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - G,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - G,Matematika,2025-12-9,07:30,09:00
+X - G,Bahasa Inggris,2025-12-9,09:30,11:00
+X - G,Penjasorkes,2025-12-9,11:30,13:00
+X - G,Biologi,2025-12-10,07:30,09:00
+X - G,Sejarah,2025-12-10,09:30,11:00
+X - G,Kimia,2025-12-10,11:30,13:00
+X - G,Sosiologi,2025-12-11,07:30,09:00
+X - G,Bahasa Sunda,2025-12-11,09:30,11:00
+X - G,Fisika,2025-12-11,11:30,13:00
+X - G,Informatika,2025-12-12,07:30,09:00
+X - G,Seni Budaya (Seni Rupa),2025-12-12,09:30,11:00
+X - G,Ekonomi,2025-12-13,07:30,09:00
+X - G,Geografi,2025-12-13,09:30,11:00
+X - H,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - H,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - H,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - H,Matematika,2025-12-9,07:30,09:00
+X - H,Bahasa Inggris,2025-12-9,09:30,11:00
+X - H,Penjasorkes,2025-12-9,11:30,13:00
+X - H,Biologi,2025-12-10,07:30,09:00
+X - H,Sejarah,2025-12-10,09:30,11:00
+X - H,Kimia,2025-12-10,11:30,13:00
+X - H,Sosiologi,2025-12-11,07:30,09:00
+X - H,Bahasa Sunda,2025-12-11,09:30,11:00
+X - H,Fisika,2025-12-11,11:30,13:00
+X - H,Informatika,2025-12-12,07:30,09:00
+X - H,Seni Budaya (Seni Rupa),2025-12-12,09:30,11:00
+X - H,Ekonomi,2025-12-13,07:30,09:00
+X - H,Geografi,2025-12-13,09:30,11:00
+X - I,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - I,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - I,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - I,Matematika,2025-12-9,07:30,09:00
+X - I,Bahasa Inggris,2025-12-9,09:30,11:00
+X - I,Penjasorkes,2025-12-9,11:30,13:00
+X - I,Biologi,2025-12-10,07:30,09:00
+X - I,Sejarah,2025-12-10,09:30,11:00
+X - I,Kimia,2025-12-10,11:30,13:00
+X - I,Sosiologi,2025-12-11,07:30,09:00
+X - I,Bahasa Sunda,2025-12-11,09:30,11:00
+X - I,Fisika,2025-12-11,11:30,13:00
+X - I,Informatika,2025-12-12,07:30,09:00
+X - I,Seni Budaya (Seni Rupa),2025-12-12,09:30,11:00
+X - I,Ekonomi,2025-12-13,07:30,09:00
+X - I,Geografi,2025-12-13,09:30,11:00
+X - J,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - J,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - J,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - J,Matematika,2025-12-9,07:30,09:00
+X - J,Bahasa Inggris,2025-12-9,09:30,11:00
+X - J,Penjasorkes,2025-12-9,11:30,13:00
+X - J,Biologi,2025-12-10,07:30,09:00
+X - J,Sejarah,2025-12-10,09:30,11:00
+X - J,Kimia,2025-12-10,11:30,13:00
+X - J,Sosiologi,2025-12-11,07:30,09:00
+X - J,Bahasa Sunda,2025-12-11,09:30,11:00
+X - J,Fisika,2025-12-11,11:30,13:00
+X - J,Informatika,2025-12-12,07:30,09:00
+X - J,Seni Budaya (Seni Tari),2025-12-12,09:30,11:00
+X - J,Ekonomi,2025-12-13,07:30,09:00
+X - J,Geografi,2025-12-13,09:30,11:00
+X - K,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - K,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - K,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - K,Matematika,2025-12-9,07:30,09:00
+X - K,Bahasa Inggris,2025-12-9,09:30,11:00
+X - K,Penjasorkes,2025-12-9,11:30,13:00
+X - K,Biologi,2025-12-10,07:30,09:00
+X - K,Sejarah,2025-12-10,09:30,11:00
+X - K,Kimia,2025-12-10,11:30,13:00
+X - K,Sosiologi,2025-12-11,07:30,09:00
+X - K,Bahasa Sunda,2025-12-11,09:30,11:00
+X - K,Fisika,2025-12-11,11:30,13:00
+X - K,Informatika,2025-12-12,07:30,09:00
+X - K,Seni Budaya (Seni Tari),2025-12-12,09:30,11:00
+X - K,Ekonomi,2025-12-13,07:30,09:00
+X - K,Geografi,2025-12-13,09:30,11:00
+X - L,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
+X - L,Pendidikan Pancasila,2025-12-8,09:30,11:00
+X - L,Bahasa Indonesia,2025-12-8,11:30,13:00
+X - L,Matematika,2025-12-9,07:30,09:00
+X - L,Bahasa Inggris,2025-12-9,09:30,11:00
+X - L,Penjasorkes,2025-12-9,11:30,13:00
+X - L,Biologi,2025-12-10,07:30,09:00
+X - L,Sejarah,2025-12-10,09:30,11:00
+X - L,Kimia,2025-12-10,11:30,13:00
+X - L,Sosiologi,2025-12-11,07:30,09:00
+X - L,Bahasa Sunda,2025-12-11,09:30,11:00
+X - L,Fisika,2025-12-11,11:30,13:00
+X - L,Informatika,2025-12-12,07:30,09:00
+X - L,Seni Budaya (Seni Tari),2025-12-12,09:30,11:00
+X - L,Ekonomi,2025-12-13,07:30,09:00
+X - L,Geografi,2025-12-13,09:30,11:00
 XI - B,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
 XI - B,Pendidikan Pancasila,2025-12-8,09:30,11:00
 XI - B,Bahasa Indonesia,2025-12-8,11:30,13:00
@@ -153,157 +345,3 @@ XI - L,Bahasa Sunda,2025-12-11,09:30,11:00
 XI - L,Kimia,2025-12-11,11:30,13:00
 XI - L,Informatika,2025-12-12,07:30,09:00
 XI - L,Seni Budaya (Rupa),2025-12-12,09:30,11:00
-X - B,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - B,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - B,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - B,Matematika,2025-12-9,07:30,09:00
-X - B,Bahasa Inggris,2025-12-9,09:30,11:00
-X - B,Penjasorkes,2025-12-9,11:30,13:00
-X - B,Biologi,2025-12-10,07:30,09:00
-X - B,Sejarah,2025-12-10,09:30,11:00
-X - B,Kimia,2025-12-10,11:30,13:00
-X - B,Sosiologi,2025-12-11,07:30,09:00
-X - B,Bahasa Sunda,2025-12-11,09:30,11:00
-X - B,Fisika,2025-12-11,11:30,13:00
-X - B,Informatika,2025-12-12,07:30,09:00
-X - B,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
-X - C,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - C,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - C,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - C,Matematika,2025-12-9,07:30,09:00
-X - C,Bahasa Inggris,2025-12-9,09:30,11:00
-X - C,Penjasorkes,2025-12-9,11:30,13:00
-X - C,Biologi,2025-12-10,07:30,09:00
-X - C,Sejarah,2025-12-10,09:30,11:00
-X - C,Kimia,2025-12-10,11:30,13:00
-X - C,Sosiologi,2025-12-11,07:30,09:00
-X - C,Bahasa Sunda,2025-12-11,09:30,11:00
-X - C,Fisika,2025-12-11,11:30,13:00
-X - C,Informatika,2025-12-12,07:30,09:00
-X - C,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
-X - D,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - D,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - D,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - D,Matematika,2025-12-9,07:30,09:00
-X - D,Bahasa Inggris,2025-12-9,09:30,11:00
-X - D,Penjasorkes,2025-12-9,11:30,13:00
-X - D,Biologi,2025-12-10,07:30,09:00
-X - D,Sejarah,2025-12-10,09:30,11:00
-X - D,Kimia,2025-12-10,11:30,13:00
-X - D,Sosiologi,2025-12-11,07:30,09:00
-X - D,Bahasa Sunda,2025-12-11,09:30,11:00
-X - D,Fisika,2025-12-11,11:30,13:00
-X - D,Informatika,2025-12-12,07:30,09:00
-X - D,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
-X - E,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - E,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - E,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - E,Matematika,2025-12-9,07:30,09:00
-X - E,Bahasa Inggris,2025-12-9,09:30,11:00
-X - E,Penjasorkes,2025-12-9,11:30,13:00
-X - E,Biologi,2025-12-10,07:30,09:00
-X - E,Sejarah,2025-12-10,09:30,11:00
-X - E,Kimia,2025-12-10,11:30,13:00
-X - E,Sosiologi,2025-12-11,07:30,09:00
-X - E,Bahasa Sunda,2025-12-11,09:30,11:00
-X - E,Fisika,2025-12-11,11:30,13:00
-X - E,Informatika,2025-12-12,07:30,09:00
-X - E,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
-X - F,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - F,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - F,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - F,Matematika,2025-12-9,07:30,09:00
-X - F,Bahasa Inggris,2025-12-9,09:30,11:00
-X - F,Penjasorkes,2025-12-9,11:30,13:00
-X - F,Biologi,2025-12-10,07:30,09:00
-X - F,Sejarah,2025-12-10,09:30,11:00
-X - F,Kimia,2025-12-10,11:30,13:00
-X - F,Sosiologi,2025-12-11,07:30,09:00
-X - F,Bahasa Sunda,2025-12-11,09:30,11:00
-X - F,Fisika,2025-12-11,11:30,13:00
-X - F,Informatika,2025-12-12,07:30,09:00
-X - F,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
-X - G,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - G,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - G,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - G,Matematika,2025-12-9,07:30,09:00
-X - G,Bahasa Inggris,2025-12-9,09:30,11:00
-X - G,Penjasorkes,2025-12-9,11:30,13:00
-X - G,Biologi,2025-12-10,07:30,09:00
-X - G,Sejarah,2025-12-10,09:30,11:00
-X - G,Kimia,2025-12-10,11:30,13:00
-X - G,Sosiologi,2025-12-11,07:30,09:00
-X - G,Bahasa Sunda,2025-12-11,09:30,11:00
-X - G,Fisika,2025-12-11,11:30,13:00
-X - G,Informatika,2025-12-12,07:30,09:00
-X - G,Prakarya dan Kewirausahaan,2025-12-12,09:30,11:00
-X - H,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - H,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - H,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - H,Matematika,2025-12-9,07:30,09:00
-X - H,Bahasa Inggris,2025-12-9,09:30,11:00
-X - H,Penjasorkes,2025-12-9,11:30,13:00
-X - H,Biologi,2025-12-10,07:30,09:00
-X - H,Sejarah,2025-12-10,09:30,11:00
-X - H,Kimia,2025-12-10,11:30,13:00
-X - H,Sosiologi,2025-12-11,07:30,09:00
-X - H,Bahasa Sunda,2025-12-11,09:30,11:00
-X - H,Fisika,2025-12-11,11:30,13:00
-X - H,Informatika,2025-12-12,07:30,09:00
-X - H,Seni Budaya (Seni Rupa),2025-12-12,09:30,11:00
-X - I,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - I,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - I,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - I,Matematika,2025-12-9,07:30,09:00
-X - I,Bahasa Inggris,2025-12-9,09:30,11:00
-X - I,Penjasorkes,2025-12-9,11:30,13:00
-X - I,Biologi,2025-12-10,07:30,09:00
-X - I,Sejarah,2025-12-10,09:30,11:00
-X - I,Kimia,2025-12-10,11:30,13:00
-X - I,Sosiologi,2025-12-11,07:30,09:00
-X - I,Bahasa Sunda,2025-12-11,09:30,11:00
-X - I,Fisika,2025-12-11,11:30,13:00
-X - I,Informatika,2025-12-12,07:30,09:00
-X - I,Seni Budaya (Seni Rupa),2025-12-12,09:30,11:00
-X - J,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - J,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - J,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - J,Matematika,2025-12-9,07:30,09:00
-X - J,Bahasa Inggris,2025-12-9,09:30,11:00
-X - J,Penjasorkes,2025-12-9,11:30,13:00
-X - J,Biologi,2025-12-10,07:30,09:00
-X - J,Sejarah,2025-12-10,09:30,11:00
-X - J,Kimia,2025-12-10,11:30,13:00
-X - J,Sosiologi,2025-12-11,07:30,09:00
-X - J,Bahasa Sunda,2025-12-11,09:30,11:00
-X - J,Fisika,2025-12-11,11:30,13:00
-X - J,Informatika,2025-12-12,07:30,09:00
-X - J,Seni Budaya (Seni Rupa),2025-12-12,09:30,11:00
-X - K,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - K,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - K,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - K,Matematika,2025-12-9,07:30,09:00
-X - K,Bahasa Inggris,2025-12-9,09:30,11:00
-X - K,Penjasorkes,2025-12-9,11:30,13:00
-X - K,Biologi,2025-12-10,07:30,09:00
-X - K,Sejarah,2025-12-10,09:30,11:00
-X - K,Kimia,2025-12-10,11:30,13:00
-X - K,Sosiologi,2025-12-11,07:30,09:00
-X - K,Bahasa Sunda,2025-12-11,09:30,11:00
-X - K,Fisika,2025-12-11,11:30,13:00
-X - K,Informatika,2025-12-12,07:30,09:00
-X - K,Seni Budaya (Seni Tari),2025-12-12,09:30,11:00
-X - L,Pend. Agama dan Budi Pekerti,2025-12-8,07:30,09:00
-X - L,Pendidikan Pancasila,2025-12-8,09:30,11:00
-X - L,Bahasa Indonesia,2025-12-8,11:30,13:00
-X - L,Matematika,2025-12-9,07:30,09:00
-X - L,Bahasa Inggris,2025-12-9,09:30,11:00
-X - L,Penjasorkes,2025-12-9,11:30,13:00
-X - L,Biologi,2025-12-10,07:30,09:00
-X - L,Sejarah,2025-12-10,09:30,11:00
-X - L,Kimia,2025-12-10,11:30,13:00
-X - L,Sosiologi,2025-12-11,07:30,09:00
-X - L,Bahasa Sunda,2025-12-11,09:30,11:00
-X - L,Fisika,2025-12-11,11:30,13:00
-X - L,Informatika,2025-12-12,07:30,09:00
-X - L,Seni Budaya (Seni Tari),2025-12-12,09:30,11:00
