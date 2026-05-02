@@ -17,7 +17,7 @@ This module also exports the dependencies you'll use everywhere else:
 from __future__ import annotations
 
 import os
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Optional
 
 import bcrypt
@@ -27,7 +27,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from database import get_db
+from database import get_db, utcnow
 from models import Student, Teacher
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -36,7 +36,13 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # JWT config
 # ---------------------------------------------------------------------------
 
-JWT_SECRET = os.environ.get("JWT_SECRET", "dev-secret-change-me-in-prod")
+# Default is 32 bytes so PyJWT doesn't warn about HMAC key length in dev.
+# Override with a random 32+ byte value (e.g. `openssl rand -base64 48`)
+# for any non-local environment.
+JWT_SECRET = os.environ.get(
+    "JWT_SECRET",
+    "dev-secret-change-me-in-prod-min-32-bytes-please",
+)
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_HOURS = 8
 
@@ -73,7 +79,7 @@ class TeacherLoginResponse(BaseModel):
 
 def create_jwt(sub: str, role: str, hours: int = JWT_EXPIRY_HOURS) -> str:
     """Issue a JWT. `sub` must be a string (UUID); JWT spec requires it."""
-    now = datetime.utcnow()
+    now = utcnow()
     payload = {
         "sub": sub,
         "role": role,

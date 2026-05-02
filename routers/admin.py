@@ -34,7 +34,7 @@ from openpyxl import Workbook
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from database import get_db
+from database import get_db, utcnow
 from models import (
     Class, Exam, ExamResult, ExamSession, ExpelledFlag,
     SessionViolation, Student,
@@ -129,7 +129,7 @@ def confirm_exam(exam_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="exam not found")
 
     exam.admin_confirmed = True
-    now = datetime.utcnow()
+    now = utcnow()
     # Spec §8.1: 'open' if we're already past scheduled_at (admin is
     # confirming late, students should be able to start immediately);
     # otherwise 'scheduled' and start_exam will gate on the time window.

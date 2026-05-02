@@ -25,7 +25,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from database import get_db
+from database import get_db, utcnow
 from models import (
     AnswerChoice, Choice, Exam, ExamResult, ExamSession,
     Question, Student, StudentAnswer,
@@ -119,7 +119,7 @@ def _time_remaining(s: ExamSession) -> int:
     if s.started_at is None:
         return s.exam.duration_minutes * 60
     deadline = _exam_window_end(s.exam, s.started_at)
-    remaining = (deadline - datetime.utcnow()).total_seconds()
+    remaining = (deadline - utcnow()).total_seconds()
     return max(0, int(remaining))
 
 
@@ -166,7 +166,7 @@ def start_exam(
             detail="exam is not yet open (admin has not confirmed)",
         )
 
-    now = datetime.utcnow()
+    now = utcnow()
     if now < exam.scheduled_at:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
@@ -263,7 +263,7 @@ def list_questions(
             status.HTTP_400_BAD_REQUEST,
             detail=f"session is {s.status}, cannot fetch questions",
         )
-    if s.locked_until and s.locked_until > datetime.utcnow():
+    if s.locked_until and s.locked_until > utcnow():
         raise HTTPException(
             status.HTTP_423_LOCKED,
             detail=f"session locked until {s.locked_until.isoformat()}",
@@ -308,7 +308,7 @@ def save_answer(
             status.HTTP_400_BAD_REQUEST,
             detail=f"session is {s.status}, cannot save answers",
         )
-    if s.locked_until and s.locked_until > datetime.utcnow():
+    if s.locked_until and s.locked_until > utcnow():
         raise HTTPException(
             status.HTTP_423_LOCKED,
             detail=f"session locked until {s.locked_until.isoformat()}",
@@ -395,7 +395,7 @@ def submit_exam(
         total_score += earned
 
     s.status = "submitted"
-    s.submitted_at = datetime.utcnow()
+    s.submitted_at = utcnow()
 
     # Replace any prior ExamResult (defensive — shouldn't exist since we
     # block re-submit above).

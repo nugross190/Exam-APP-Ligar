@@ -7,6 +7,7 @@ automatically by the Railway PG plugin.
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -40,3 +41,15 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def utcnow() -> datetime:
+    """Naive UTC datetime — same semantics as the deprecated
+    `datetime.utcnow()`, but without the DeprecationWarning on 3.12+.
+
+    Naive (tzinfo=None) on purpose: every DateTime column in models.py
+    is naive too, so mixing aware/naive datetimes in comparisons would
+    raise. If we ever migrate columns to `DateTime(timezone=True)`,
+    drop the .replace() and propagate the tz-aware values everywhere.
+    """
+    return datetime.now(timezone.utc).replace(tzinfo=None)

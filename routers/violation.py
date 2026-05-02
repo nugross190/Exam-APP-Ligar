@@ -21,7 +21,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from database import get_db
+from database import get_db, utcnow
 from models import (
     ExamSession, ExpelledFlag, SessionViolation, Student, Teacher,
 )
@@ -104,7 +104,7 @@ def record_violation(
     db.add(SessionViolation(
         session_id=s.id,
         event_type=body.event_type,
-        occurred_at=datetime.utcnow(),
+        occurred_at=utcnow(),
     ))
     s.violation_count = (s.violation_count or 0) + 1
 
@@ -112,7 +112,7 @@ def record_violation(
     message = "warning recorded"
     if s.violation_count >= _EXPEL_THRESHOLD:
         s.status = "expelled"
-        s.submitted_at = s.submitted_at or datetime.utcnow()
+        s.submitted_at = s.submitted_at or utcnow()
         # Surface to homeroom teacher (spec §6.2).
         db.add(ExpelledFlag(
             session_id=s.id,
@@ -122,7 +122,7 @@ def record_violation(
         expelled = True
         message = "expelled: violation threshold reached"
     elif s.violation_count == 2:
-        s.locked_until = datetime.utcnow() + timedelta(seconds=_LOCKOUT_SECONDS)
+        s.locked_until = utcnow() + timedelta(seconds=_LOCKOUT_SECONDS)
         message = f"second violation: locked for {_LOCKOUT_SECONDS}s"
 
     db.commit()
@@ -160,7 +160,7 @@ def panic(
         )
 
     s.status = "panic"
-    s.panic_at = datetime.utcnow()
+    s.panic_at = utcnow()
     db.commit()
     db.refresh(s)
 

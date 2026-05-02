@@ -38,12 +38,12 @@ from __future__ import annotations
 
 import io
 import sys
-from datetime import datetime, time, timedelta
+from datetime import time, timedelta
 
 import bcrypt
 from fastapi.testclient import TestClient
 
-from database import SessionLocal
+from database import SessionLocal, utcnow
 from main import app
 from models import (
     AnswerChoice, Choice, Class, ClassSubject, Exam, ExamResult,
@@ -161,7 +161,7 @@ try:
 
     # Reset exam state — admin_confirmed False so /admin/exam/{id}/confirm
     # has something to flip; window includes "now" so /exam/start works.
-    now = datetime.utcnow()
+    now = utcnow()
     exam.admin_confirmed = False
     exam.status = "scheduled"
     exam.scheduled_at = now - timedelta(minutes=1)

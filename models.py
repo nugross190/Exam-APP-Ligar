@@ -10,13 +10,14 @@ UUID primary keys throughout. Postgres in production, SQLite for tests
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
 
 from sqlalchemy import (
     Boolean, Column, DateTime, Float, ForeignKey, Integer, JSON,
     String, Text, Time, UniqueConstraint,
 )
 from sqlalchemy.orm import declarative_base, relationship
+
+from database import utcnow
 
 Base = declarative_base()
 
@@ -176,7 +177,7 @@ class SessionViolation(Base):
     id = Column(String(36), primary_key=True, default=_uuid)
     session_id = Column(String(36), ForeignKey("exam_sessions.id"), nullable=False)
     event_type = Column(String(30), nullable=False)  # 'tab_switch'|'fullscreen_exit'
-    occurred_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    occurred_at = Column(DateTime, nullable=False, default=utcnow)
 
     session = relationship("ExamSession", back_populates="violations")
 
@@ -208,7 +209,7 @@ class ExamResult(Base):
     session_id = Column(String(36), ForeignKey("exam_sessions.id"), unique=True, nullable=False)
     total_score = Column(Float, nullable=False)
     max_score = Column(Float, nullable=False)
-    finalized_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    finalized_at = Column(DateTime, nullable=False, default=utcnow)
 
     session = relationship("ExamSession", back_populates="result")
 
@@ -224,7 +225,7 @@ class DataFlag(Base):
     id = Column(String(36), primary_key=True, default=_uuid)
     student_id = Column(String(36), ForeignKey("students.id"), nullable=False)
     note = Column(Text, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=utcnow)
 
     student = relationship("Student", back_populates="data_flags")
 
@@ -237,5 +238,5 @@ class ExpelledFlag(Base):
     session_id = Column(String(36), ForeignKey("exam_sessions.id"), nullable=False)
     class_id = Column(String(36), ForeignKey("classes.id"), nullable=False)
     student_id = Column(String(36), ForeignKey("students.id"), nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=utcnow)
     acknowledged_at = Column(DateTime, nullable=True)
