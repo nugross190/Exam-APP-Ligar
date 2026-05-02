@@ -1,0 +1,902 @@
+[
+  {
+    "kode": 1,
+    "nama": "Effen Heryana, M.Pd",
+    "nip": "19730727 199802 1 001",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "1",
+        "mapel": "Kepala Sekolah"
+      }
+    ]
+  },
+  {
+    "kode": 2,
+    "nama": "H. Saepudin, S.Pd. M.Pd.",
+    "nip": "19690401 199403 1 005",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "2",
+        "mapel": "Matematika"
+      }
+    ]
+  },
+  {
+    "kode": 3,
+    "nama": "Yusup Iskandar, S.Pd.",
+    "nip": "19730306 200604 1 013",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "3",
+        "mapel": "Bahasa Inggris"
+      }
+    ]
+  },
+  {
+    "kode": 4,
+    "nama": "Drs. Yuyus Ali Kusnindar, M.Pd",
+    "nip": "19660807 199203 1 011",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "4",
+        "mapel": "Seni Budaya (Seni Rupa)"
+      }
+    ]
+  },
+  {
+    "kode": 5,
+    "nama": "Heni Hendrawati, S.Pd. M.Pd.",
+    "nip": "19780317 200312 2 005",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "5",
+        "mapel": "Bahasa dan Sastra Jepang"
+      }
+    ]
+  },
+  {
+    "kode": 6,
+    "nama": "Budi Syahbudin, S.Pd.",
+    "nip": "19680614 200501 1 008",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "6",
+        "mapel": "Kimia"
+      }
+    ]
+  },
+  {
+    "kode": 7,
+    "nama": "Wawan I. Irawan, S.Pd. M.Pd",
+    "nip": "19710821 200604 1 014",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "7",
+        "mapel": "Penjasorkes"
+      }
+    ]
+  },
+  {
+    "kode": 8,
+    "nama": "Asep Ramdan, S.Pd.",
+    "nip": "19690319 200501 1 009",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "8",
+        "mapel": "Sejarah Indonesia Wajib"
+      }
+    ]
+  },
+  {
+    "kode": 9,
+    "nama": "Mauludi Darmawan S.P., M.Pd.",
+    "nip": "19690620 201410 1 001",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "9",
+        "mapel": "Kimia"
+      }
+    ]
+  },
+  {
+    "kode": 10,
+    "nama": "Hj. Yeni Rahmawati, S.E., S.Pd., M.Pd",
+    "nip": "19770908 201410 2 002",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "10",
+        "mapel": "Ekonomi"
+      }
+    ]
+  },
+  {
+    "kode": 11,
+    "nama": "Reni Renofa, S.Pd., M.Pd.",
+    "nip": "19781027 201411 2 001",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "11",
+        "mapel": "Biologi"
+      }
+    ]
+  },
+  {
+    "kode": 12,
+    "nama": "Dedi Hartono, S.Pd.",
+    "nip": "19800410 201411 1 001",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "12",
+        "mapel": "Kimia"
+      }
+    ]
+  },
+  {
+    "kode": 13,
+    "nama": "Diah Sekarini, S.S., M.Pd",
+    "nip": "19801217 201409 2 002",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "13",
+        "mapel": "Bahaasa Indonesia"
+      },
+      {
+        "sub_kode": "13.1",
+        "mapel": "Bahaasa Indonesia Tingkat Lanjut"
+      }
+    ]
+  },
+  {
+    "kode": 14,
+    "nama": "Aas Suherman, S.P.",
+    "nip": "19670223 201409 1 001",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "14",
+        "mapel": "Prakarya dan Kewirausahaan"
+      }
+    ]
+  },
+  {
+    "kode": 15,
+    "nama": "Sopyan Abdillah, S.Pd., M.Pd.",
+    "nip": "19740427 201409 1 001",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "15",
+        "mapel": "Matematika"
+      }
+    ]
+  },
+  {
+    "kode": 16,
+    "nama": "Efinda Nurdiansah, S.Pd. M.Pd.",
+    "nip": "19780728 201409 1 003",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "16",
+        "mapel": "Biologi"
+      }
+    ]
+  },
+  {
+    "kode": 17,
+    "nama": "Yuyus Yustiana, S.Pd.I. M.Pd.",
+    "nip": "19791010 201409 1 002",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "17",
+        "mapel": "Bahasa dan Sastra Arab"
+      }
+    ]
+  },
+  {
+    "kode": 18,
+    "nama": "Ruhul Husna, S.Pd, M.Pd",
+    "nip": "19810429 201409 1 002",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "18",
+        "mapel": "PPKn"
+      }
+    ]
+  },
+  {
+    "kode": 19,
+    "nama": "Heri Supriadi, S.Pd.I, Gr.",
+    "nip": "19880112 201903 1 007",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "19",
+        "mapel": "Pend. Agama dan Budi Pekerti"
+      }
+    ]
+  },
+  {
+    "kode": 20,
+    "nama": "Silvi Uswatun Nisa, M.Pd",
+    "nip": "19940310 201903 2 018",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "20",
+        "mapel": "Matematika"
+      }
+    ]
+  },
+  {
+    "kode": 21,
+    "nama": "Nurul Nur Azizah, S.Pd",
+    "nip": "19950718 201903 2 013",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "21",
+        "mapel": "Bahasa Indonesia"
+      }
+    ]
+  },
+  {
+    "kode": 22,
+    "nama": "Firman Nugraha, M.Pd",
+    "nip": "19960304 202012 1 011",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "22",
+        "mapel": "Fisika"
+      }
+    ]
+  },
+  {
+    "kode": 23,
+    "nama": "N. Syifa Aghnia, S.Pd",
+    "nip": "19960316 202012 2 024",
+    "status": "PNS",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "23",
+        "mapel": "Sejarah Umum"
+      }
+    ]
+  },
+  {
+    "kode": 24,
+    "nama": "H. Ade Solihin, S.Ag.",
+    "nip": "19690815 202121 1 003",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "24",
+        "mapel": "Pend. Agama dan Budi Pekerti"
+      }
+    ]
+  },
+  {
+    "kode": 25,
+    "nama": "Samsul Aziz, S.Hum. S.Pd, Gr.",
+    "nip": "19810609 202121 1 003",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "25",
+        "mapel": "Sejarah Umum"
+      }
+    ]
+  },
+  {
+    "kode": 26,
+    "nama": "Asep Kuswanto Ramdhan, S.Pd.",
+    "nip": "19820708 202121 1 001",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "26",
+        "mapel": "Bahasa Inggris"
+      },
+      {
+        "sub_kode": "26.1",
+        "mapel": "Seni Budaya (Seni Musik)"
+      }
+    ]
+  },
+  {
+    "kode": 27,
+    "nama": "Heni Nurani, S.Pd.",
+    "nip": "19820608 202121 2 002",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "27",
+        "mapel": "Bahasa Inggris"
+      }
+    ]
+  },
+  {
+    "kode": 28,
+    "nama": "Hj. Keuis Erni Hendriyani, S.Pd",
+    "nip": "19760815 202221 2 004",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "28",
+        "mapel": "Sejarah Umum"
+      }
+    ]
+  },
+  {
+    "kode": 29,
+    "nama": "Rd. Diana Budiman, S.Pd.",
+    "nip": "19771219 202221 1 003",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "29",
+        "mapel": "Bahasa Indonesia"
+      }
+    ]
+  },
+  {
+    "kode": 30,
+    "nama": "Deti Ihsan Fitriani, S.Pd. Gr.",
+    "nip": "19860506 202221 2 041",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "30",
+        "mapel": "Fisika"
+      }
+    ]
+  },
+  {
+    "kode": 31,
+    "nama": "Selvi Primasari, S.Pd. Gr.",
+    "nip": "19910930 202221 2 002",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "31",
+        "mapel": "Sosiologi"
+      }
+    ]
+  },
+  {
+    "kode": 32,
+    "nama": "Garnis Putri Lestari, S.Pd",
+    "nip": "19920602 202221 2 010",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "32",
+        "mapel": "Prakarya dan Kewirausahaan"
+      }
+    ]
+  },
+  {
+    "kode": 33,
+    "nama": "Sely Puspita Sari, S.Pd., Gr.",
+    "nip": "19931016 202221 2 011",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "33",
+        "mapel": "Geografi"
+      }
+    ]
+  },
+  {
+    "kode": 34,
+    "nama": "Fahmi Sohibul Fiqhi, S.Pd",
+    "nip": "19960827 202221 1 012",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "34",
+        "mapel": "Informatika/Bimbingan TIK"
+      }
+    ]
+  },
+  {
+    "kode": 35,
+    "nama": "Subhanulpalah, ST",
+    "nip": "19720904 202221 1 003",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "35",
+        "mapel": "Fisika"
+      },
+      {
+        "sub_kode": "35.1",
+        "mapel": "Matematika Umum"
+      }
+    ]
+  },
+  {
+    "kode": 36,
+    "nama": "Yayu Yuritta Sari, M.Pd., Gr.",
+    "nip": "19850131 202221 2 030",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "36",
+        "mapel": "Bahasa Indonesia"
+      }
+    ]
+  },
+  {
+    "kode": 37,
+    "nama": "Mega Zenita Mufatir, S.Pd",
+    "nip": "19900126 202221 2 023",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "37",
+        "mapel": "Matematika Umum"
+      },
+      {
+        "sub_kode": "37.1",
+        "mapel": "Matematika Peminatan"
+      },
+      {
+        "sub_kode": "37.2",
+        "mapel": "Matematika Tingkat Lanjut"
+      }
+    ]
+  },
+  {
+    "kode": 38,
+    "nama": "Moh Rizki Maulana S, S.Pd",
+    "nip": "19901015 202221 1 012",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "38",
+        "mapel": "Penjasorkes"
+      }
+    ]
+  },
+  {
+    "kode": 39,
+    "nama": "Eris Fathoni, S.T",
+    "nip": "19910121 202221 1 013",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "39",
+        "mapel": "Bimbingan TIK"
+      }
+    ]
+  },
+  {
+    "kode": 40,
+    "nama": "Tantri Febri Zanah, S.St",
+    "nip": "19910206 202221 2 020",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "40",
+        "mapel": "Informatika"
+      },
+      {
+        "sub_kode": "40.1",
+        "mapel": "Matematika Wajib"
+      }
+    ]
+  },
+  {
+    "kode": 41,
+    "nama": "Jajang Saepul, S.Kom",
+    "nip": "19940307 202221 1 006",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "41",
+        "mapel": "Bimbingan TIK"
+      }
+    ]
+  },
+  {
+    "kode": 42,
+    "nama": "Perni Rosanti, S.Pd",
+    "nip": "19960731 202221 2 012",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "42",
+        "mapel": "Informatika"
+      }
+    ]
+  },
+  {
+    "kode": 43,
+    "nama": "Ade Artiyani Hasanah, S.Pd",
+    "nip": "19961014 202221 2 005",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "43",
+        "mapel": "Sejarah Peminatan"
+      },
+      {
+        "sub_kode": "43.1",
+        "mapel": "Sejarah Tingkat Lanjut"
+      }
+    ]
+  },
+  {
+    "kode": 44,
+    "nama": "Risnawati, S.Ag. Gr.",
+    "nip": "19740801 202321 2 005",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "44",
+        "mapel": "Pend. Agama dan Budi Pekerti"
+      }
+    ]
+  },
+  {
+    "kode": 45,
+    "nama": "Arum Kinanti, S.Si",
+    "nip": "19810726 202321 2 010",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "45",
+        "mapel": "Matematika Umum"
+      },
+      {
+        "sub_kode": "45.1",
+        "mapel": "Fisika"
+      }
+    ]
+  },
+  {
+    "kode": 46,
+    "nama": "Rofi Fitriadin, S.Pd. Gr.",
+    "nip": "19880515 202321 1 007",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "46",
+        "mapel": "Bahasa Sunda"
+      }
+    ]
+  },
+  {
+    "kode": 47,
+    "nama": "Asep Nugraha, S.Pd, Gr.",
+    "nip": null,
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "47",
+        "mapel": "Matematika Peminatan"
+      }
+    ]
+  },
+  {
+    "kode": 48,
+    "nama": "Purkonul Hakim, S.Pd.I",
+    "nip": "19750108 202421 1 003",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "48",
+        "mapel": "Pend. Agama dan Budi Pekerti"
+      },
+      {
+        "sub_kode": "48.1",
+        "mapel": "Bahasa dan Sastra Arab"
+      },
+      {
+        "sub_kode": "48.2",
+        "mapel": "Seni Budaya  (Seni Rupa)"
+      }
+    ]
+  },
+  {
+    "kode": 49,
+    "nama": "Ridwan Hartanto, S.Pd",
+    "nip": "19780408 202421 1 004",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "49",
+        "mapel": "Pendidikan Pancasila"
+      },
+      {
+        "sub_kode": "49.1",
+        "mapel": "Geografi"
+      },
+      {
+        "sub_kode": "49.2",
+        "mapel": "Bimbingan Konseling"
+      }
+    ]
+  },
+  {
+    "kode": 50,
+    "nama": "Ani Yulistiani, S.Pd",
+    "nip": "19891018 202421 2 023",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "50",
+        "mapel": "Pendidikan Pancasila"
+      },
+      {
+        "sub_kode": "50.1",
+        "mapel": "Geografi"
+      }
+    ]
+  },
+  {
+    "kode": 51,
+    "nama": "Siti Alfiyani Nur Ash S. S.Pd.I",
+    "nip": "19920310 202421 2 033",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "51",
+        "mapel": "Pend. Agama dan Budi Pekerti"
+      },
+      {
+        "sub_kode": "51.1",
+        "mapel": "Bimbingan Konseling"
+      },
+      {
+        "sub_kode": "51.2",
+        "mapel": "Geografi"
+      }
+    ]
+  },
+  {
+    "kode": 52,
+    "nama": "Tini Supartini, S.Sos. Gr.",
+    "nip": "19910903 202521 2 010",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "52",
+        "mapel": "Sosiologi"
+      }
+    ]
+  },
+  {
+    "kode": 53,
+    "nama": "Lukman Nulhakim, S.Pd",
+    "nip": "19880106 202521 1 005",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "53",
+        "mapel": "Prakarya dan Kewirausahaan"
+      },
+      {
+        "sub_kode": "53.1",
+        "mapel": "Ekonomi"
+      }
+    ]
+  },
+  {
+    "kode": 54,
+    "nama": "Nenih Hartini, S.Pd. Gr.",
+    "nip": "19740711 202521 2 025",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "54",
+        "mapel": "Biologi"
+      }
+    ]
+  },
+  {
+    "kode": 55,
+    "nama": "Dra. Ai Sumiati, Gr",
+    "nip": "19690905 202521 2 010",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "55",
+        "mapel": "Pend. Agama dan Budi Pekerti"
+      }
+    ]
+  },
+  {
+    "kode": 56,
+    "nama": "Yusti Arma Dewita, S.Pd",
+    "nip": "19880703 202521 2 137",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "56",
+        "mapel": "Bahasa Indonesia"
+      }
+    ]
+  },
+  {
+    "kode": 57,
+    "nama": "Opa Rismana, S.Pd",
+    "nip": "19840417 202521 1 137",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "57",
+        "mapel": "Pendidikan Pancasila"
+      },
+      {
+        "sub_kode": "57.1",
+        "mapel": "Bimbingan Konseling"
+      }
+    ]
+  },
+  {
+    "kode": 58,
+    "nama": "Rio Rosadi, S.Pd.",
+    "nip": "19940718 202521 1 119",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "58",
+        "mapel": "Penjasorkes"
+      }
+    ]
+  },
+  {
+    "kode": 59,
+    "nama": "Asep Widarman, S.Pd.",
+    "nip": "19900327 202521 1 127",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "59",
+        "mapel": "Pendidikan Pancasila/PPKn"
+      },
+      {
+        "sub_kode": "59.1",
+        "mapel": "Ekonomi"
+      }
+    ]
+  },
+  {
+    "kode": 60,
+    "nama": "Nira Herdiani, S.Pd",
+    "nip": "19940724 202521 2 154",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "60",
+        "mapel": "Bahasa Inggris"
+      },
+      {
+        "sub_kode": "60.1",
+        "mapel": "Sastra Inggris"
+      },
+      {
+        "sub_kode": "60.2",
+        "mapel": "B.Inggris Tingkat Lanjut"
+      }
+    ]
+  },
+  {
+    "kode": 61,
+    "nama": "Imam Aditya Nugraha, S.Pd",
+    "nip": "19920810 202521 1 144",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "61",
+        "mapel": "Penjasorkes"
+      },
+      {
+        "sub_kode": "61.1",
+        "mapel": "Geografi"
+      }
+    ]
+  },
+  {
+    "kode": 62,
+    "nama": "Masniara Nurul Azmi, S.Pd",
+    "nip": "19961113 202521 2 140",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "62",
+        "mapel": "Bahasa Sunda"
+      },
+      {
+        "sub_kode": "62.1",
+        "mapel": "Seni Budaya (Seni Tari)"
+      }
+    ]
+  },
+  {
+    "kode": 63,
+    "nama": "Sahru Ramadhan, S.Pd",
+    "nip": "19900326 202521 1 118",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "63",
+        "mapel": "Penjasorkes"
+      }
+    ]
+  },
+  {
+    "kode": 64,
+    "nama": "Intan Citra Dewi M., S.Pd",
+    "nip": "19940808 202521 2 214",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "64",
+        "mapel": "Bimbingan Konseling"
+      }
+    ]
+  },
+  {
+    "kode": 65,
+    "nama": "Rifni Nurdieni, S.Kom.I., S.Pd.Gr",
+    "nip": "19940925 202521 2 162",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "65",
+        "mapel": "Bimbingan Konseling"
+      }
+    ]
+  },
+  {
+    "kode": 66,
+    "nama": "Fenti Susilawati, S.Pd. Gr.",
+    "nip": "19931215 202521 2 140",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "66",
+        "mapel": "Bahasa Inggris"
+      },
+      {
+        "sub_kode": "66.1",
+        "mapel": "Sastra Inggris"
+      },
+      {
+        "sub_kode": "66.2",
+        "mapel": "B. Inggris Tingkat Lanjut"
+      }
+    ]
+  },
+  {
+    "kode": 67,
+    "nama": "Fidya Datian Nurfadila, S.Pd",
+    "nip": "-",
+    "status": "PPPK",
+    "mata_pelajaran": [
+      {
+        "sub_kode": "67",
+        "mapel": "Bahasa Sunda"
+      }
+    ]
+  }
+]
