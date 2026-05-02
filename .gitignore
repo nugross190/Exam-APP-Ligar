@@ -48,3 +48,6 @@ htmlcov/
 *.db
 *.sqlite
 *.sqlite3
+
+# Uploaded question images (local-volume storage; R2 in prod)
+uploads/
