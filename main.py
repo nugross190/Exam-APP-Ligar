@@ -6,11 +6,13 @@ are built (exam, violation, teacher, admin) they'll be included here.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from routers import auth, confirm, exam, violation
+from routers import auth, confirm, exam, teacher, violation
 
 app = FastAPI(
     title="HADIR Exam App",
@@ -37,9 +39,16 @@ app.include_router(confirm.router)
 # Week 2 - Core Exam Engine
 app.include_router(exam.router)
 app.include_router(violation.router)
+app.include_router(teacher.router)
+
+# Static mount for question images uploaded via /teacher/question/{id}/image.
+# In production this should point at a Railway volume or be replaced by an
+# R2/S3 redirect; the URL prefix is matched in routers/teacher.py.
+_upload_dir = Path(os.environ.get("UPLOAD_DIR", "uploads")).resolve()
+_upload_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(_upload_dir)), name="uploads")
 
 # As you build more, uncomment as you go:
-# app.include_router(teacher.router)
 # app.include_router(admin.router)
 
 
