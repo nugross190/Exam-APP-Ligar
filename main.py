@@ -12,6 +12,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from database import SessionLocal, engine
+from models import Base, Teacher
 from routers import auth, confirm, exam, teacher, violation
 
 app = FastAPI(
@@ -19,6 +21,37 @@ app = FastAPI(
     description="School exam administration system for SMAN 5 Garut",
     version="0.1.0",
 )
+
+
+@app.on_event("startup")
+def _ensure_schema_and_bootstrap_admin() -> None:
+    # No alembic migrations are configured yet; create any missing tables
+    # so a fresh deploy doesn't 500 on the first DB query (e.g. login).
+    Base.metadata.create_all(bind=engine)
+
+    # Bootstrap an admin teacher when ADMIN_USERNAME / ADMIN_PASSWORD are
+    # set, so the teacher portal is reachable on a clean DB. Idempotent:
+    # only inserts if the username doesn't already exist.
+    admin_user = os.environ.get("ADMIN_USERNAME")
+    admin_pw = os.environ.get("ADMIN_PASSWORD")
+    if not (admin_user and admin_pw):
+        return
+    import bcrypt
+    db = SessionLocal()
+    try:
+        if db.query(Teacher).filter_by(username=admin_user).first() is not None:
+            return
+        db.add(Teacher(
+            username=admin_user,
+            password_hash=bcrypt.hashpw(
+                admin_pw.encode("utf-8"), bcrypt.gensalt(rounds=10),
+            ).decode("utf-8"),
+            full_name=os.environ.get("ADMIN_FULL_NAME", admin_user),
+            role=os.environ.get("ADMIN_ROLE", "admin"),
+        ))
+        db.commit()
+    finally:
+        db.close()
 
 # CORS. During testing Railway will serve the static client from the same
 # origin so this is mostly for local dev (file:// or 127.0.0.1).
